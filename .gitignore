@@ -26,13 +26,13 @@ venv/
 .pytest_cache/
 *.egg-info/
 
-# Intermediate data (re-derivable)
+# Auto-generated intermediate data (re-derivable from scripts)
 data/candidates.json
-data/anchors.json
 data/palette.json
 
-# Keep logo + pantone reference
+# Keep tracked: logo, manual curation, vendored references
 !data/logo.png
+!data/anchors.json
 !data/pantone-solid-coated.csv
 
 # Temp clones

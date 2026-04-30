@@ -1,0 +1,25 @@
+{
+  "blue": {
+    "darkest":  "#223D7A",
+    "dark":     "#325FAC",
+    "anchor":   "#164999",
+    "lightest": "#0EA3DD"
+  },
+  "green": {
+    "anchor":   "#71BF4D",
+    "alt":      "#A6CF4E"
+  },
+  "_notes": {
+    "decision_date": "2026-04-30",
+    "user_choices": {
+      "blue_500": "Selected #164999 (deep navy) over #0EA3DD (cyan-blue) — traditional brand identity feel.",
+      "green_500": "Selected #71BF4D (true green) over #A6CF4E (yellow-green) — classic chemistry/sustainability green."
+    },
+    "logo_color_gaps": {
+      "blue_700_gap": "#223D7A is only 3% darker than anchor (#164999); palette generation must algorithmically darken anchor for blue-700.",
+      "blue_300_gap": "#0EA3DD is 12% lighter than anchor; usable as blue-300.",
+      "green_700_gap": "#A6CF4E is *lighter* than anchor (not darker); palette generation must algorithmically darken anchor for green-700.",
+      "green_300_gap": "#A6CF4E is only 3% lighter than anchor; insufficient for green-300; must algorithmically lighten anchor."
+    }
+  }
+}
