@@ -1,0 +1,19 @@
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Build artifacts (placeholder — populated as the implementation progresses)
+node_modules/
+dist/
+build/
+
+# Local-only working files
+*.local
+*.tmp
