@@ -16,7 +16,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 PALETTE = ROOT / "outputs" / "palette.json"
 LOGO = ROOT / "data" / "logo.png"
-OUT = ROOT / "gworkspace" / "gmail-signature.htm"
+OUT = ROOT / "gworkspace" / "gmail-signature.html"
 
 # Gmail enforces ~10 KB on signatures. We target well under to leave headroom.
 LOGO_WIDTH = 100

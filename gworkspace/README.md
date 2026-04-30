@@ -4,7 +4,7 @@ This folder makes the Deccan design system work in Google Workspace for an end-u
 
 ## What's here
 
-- `gmail-signature.htm` — Gmail-optimized HTML email signature (under Gmail's 10 KB size limit)
+- `gmail-signature.html` — Gmail-optimized HTML email signature (under Gmail's 10 KB size limit)
 
 The Slides / Docs / Sheets templates are reused from `office/templates/` — Google Workspace opens OOXML files natively and converts them to native Google formats, so we don't generate separate Slides/Docs/Sheets files.
 
@@ -30,7 +30,7 @@ If a specific template has unacceptable conversion loss for your use case, reque
 
 ## Gmail signature
 
-1. Open `gmail-signature.htm` in a browser (double-click the file).
+1. Open `gmail-signature.html` in a browser (double-click the file).
 2. The browser displays the rendered signature.
 3. Select all (Ctrl+A), copy (Ctrl+C).
 4. In Gmail, click the **Settings** gear → **See all settings** → **General** tab.
@@ -49,4 +49,4 @@ If the Plan 1 palette or logo changes, re-run:
 python scripts\_10_emit_gworkspace.py
 ```
 
-This regenerates `gmail-signature.htm` with the current palette + logo.
+This regenerates `gmail-signature.html` with the current palette + logo.

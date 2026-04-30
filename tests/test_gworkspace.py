@@ -8,7 +8,7 @@ import pytest
 from scripts.lib import gmail_signature
 
 ROOT = Path(__file__).resolve().parents[1]
-SIG = ROOT / "gworkspace" / "gmail-signature.htm"
+SIG = ROOT / "gworkspace" / "gmail-signature.html"
 
 
 @pytest.fixture(scope="module", autouse=True)
