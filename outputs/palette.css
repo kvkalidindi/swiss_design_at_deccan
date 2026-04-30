@@ -1,0 +1,28 @@
+:root {
+  --accent-blue-100: #E0E8F5;
+  --accent-blue-300: #0EA3DD;
+  --accent-blue-500: #164999;
+  --accent-blue-700: #0C2956;
+  --accent-green-100: #E9EFE6;
+  --accent-green-300: #A1CB8D;
+  --accent-green-500: #71BF4D;
+  --accent-green-700: #4F8D33;
+}
+
+/* Tailwind config snippet:
+module.exports = {
+  theme: { extend: { colors: {
+    blue: {
+      '100': '#E0E8F5',
+      '300': '#0EA3DD',
+      '500': '#164999',
+      '700': '#0C2956',
+    },
+    green: {
+      '100': '#E9EFE6',
+      '300': '#A1CB8D',
+      '500': '#71BF4D',
+      '700': '#4F8D33',
+    },
+  } } }
+} */
