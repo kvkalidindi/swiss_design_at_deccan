@@ -25,9 +25,41 @@ Primary: **IBM Plex Sans** (display/body/UI), **IBM Plex Mono** (code).
 Fallbacks: Hanken Grotesk, Barlow, Host Grotesk, DM Sans, Fira Code.
 All SIL OFL 1.1 — enterprise-deployable without licensing concerns.
 
+**Plan 2 complete (v0.2.0)** — Deccan Swiss-design skill shipped.
+
+- `skill/SKILL.md` + 6 reference files — installable Claude Code skill
+- Single accent (`#164999`); secondary green mark restricted to logo / sustainability
+- Re-generated from upstream via `scripts/_08_emit_skill.py` (idempotent)
+
+### Installing the skill
+
+**User-level install (Windows PowerShell):**
+
+```powershell
+$dest = "$env:USERPROFILE\.claude\skills\swiss-design-deccan"
+if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
+Copy-Item -Path skill -Destination $dest -Recurse -Force
+```
+
+**User-level install (macOS / Linux):**
+
+```bash
+cp -r skill "$HOME/.claude/skills/swiss-design-deccan"
+```
+
+Claude Code picks it up automatically on next session.
+
+**Plugin manifest install:** add an entry to `~/.claude/plugins/manifest.json`:
+
+```json
+{ "plugins": [
+  { "name": "swiss-design-deccan", "path": "/absolute/path/to/swiss_design_at_deccan/skill" }
+]}
+```
+
 ## Roadmap
 
-- **Plan 2** — modify `zeke/swiss-design-skill` to consume these tokens
+- ~~**Plan 2** — modify `zeke/swiss-design-skill` to consume these tokens~~ **complete (v0.2.0)**
 - **Plan 3** — Microsoft Office artifacts (.thmx themes, .dotx/.potx/.xltx templates)
 - **Plan 4** — Google Workspace artifacts (Slides/Docs templates, admin gallery)
 - **Plan 5** — Enterprise deployment (Intune profiles, Group Policy, font installation)
