@@ -57,9 +57,18 @@ Claude Code picks it up automatically on next session.
 ]}
 ```
 
+**Plan 3 complete (v0.3.0)** — Microsoft Office artifacts shipped.
+
+- `office/office-theme.thmx` — installable Office theme with 12-slot color scheme
+- `office/templates/deccan.{dotx,potx,xltx}` — Word/PowerPoint/Excel templates
+- `office/templates/signature.htm` — Outlook email signature with embedded logo
+- `office/README.md` — install instructions
+
+See `office/README.md` for per-user install. Plan 5 will automate fleet deployment via Intune/GPO.
+
 ## Roadmap
 
 - ~~**Plan 2** — modify `zeke/swiss-design-skill` to consume these tokens~~ **complete (v0.2.0)**
-- **Plan 3** — Microsoft Office artifacts (.thmx themes, .dotx/.potx/.xltx templates)
+- ~~**Plan 3** — Microsoft Office artifacts (.thmx themes, .dotx/.potx/.xltx templates)~~ **complete (v0.3.0)**
 - **Plan 4** — Google Workspace artifacts (Slides/Docs templates, admin gallery)
 - **Plan 5** — Enterprise deployment (Intune profiles, Group Policy, font installation)
