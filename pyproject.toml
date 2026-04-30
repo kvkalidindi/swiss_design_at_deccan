@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deccan-design-system"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "pillow>=10.0",
+    "scikit-learn>=1.4",
+    "numpy>=1.26",
+    "colormath>=3.0.0",
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.4"]
+
+[tool.setuptools]
+packages = ["scripts"]

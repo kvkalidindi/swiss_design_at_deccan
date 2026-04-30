@@ -17,3 +17,23 @@ build/
 # Local-only working files
 *.local
 *.tmp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Intermediate data (re-derivable)
+data/candidates.json
+data/anchors.json
+data/palette.json
+
+# Keep logo + pantone reference
+!data/logo.png
+!data/pantone-solid-coated.csv
+
+# Temp clones
+.tmp_swiss/
