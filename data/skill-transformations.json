@@ -1,0 +1,36 @@
+{
+  "frontmatter": {
+    "name": "swiss-design-deccan",
+    "description": "Apply the Deccan Chemicals design system (Swiss International Style adapted for Deccan brand). Use when styling Deccan webpages, cleaning up Deccan UIs, or applying the corporate design system. Single accent #164999 (deep navy), IBM Plex Sans typography, opacity-based hierarchy, structured grid. Secondary green mark #71BF4D is reserved for the corporate logo and explicit sustainability content only.",
+    "license": "MIT",
+    "metadata": {
+      "author": "kvkalidindi",
+      "version": "0.2.0",
+      "upstream": "https://github.com/zeke/swiss-design-skill",
+      "based_on": "swiss-design 1.0"
+    }
+  },
+  "color_replacements": [
+    { "find": "#C8102E", "replace": "#164999", "context": "primary accent (Swiss Red -> Deccan Blue)" },
+    { "find": "rgba(200, 16, 46, 0.60)", "replace": "rgba(22, 73, 153, 0.60)", "context": "Swiss Red 60% opacity -> Deccan Blue 60% opacity" },
+    { "find": "rgba(200, 16, 46, 0.20)", "replace": "rgba(22, 73, 153, 0.20)", "context": "Swiss Red 20% opacity -> Deccan Blue 20% opacity" },
+    { "find": "rgba(200, 16, 46, 0.10)", "replace": "rgba(22, 73, 153, 0.10)", "context": "Swiss Red 10% opacity -> Deccan Blue 10% opacity" }
+  ],
+  "name_replacements": [
+    { "find": "Swiss Red", "replace": "Deccan Blue", "context": "primary accent name" }
+  ],
+  "section_replacements": [
+    {
+      "anchor": "design-system.md accent table",
+      "context": "Replace 4-option accent table with single Deccan entry plus secondary-mark note",
+      "find_block": "| Name | Hex | When to use |\n| ---- | --- | ----------- |\n| Swiss Red | `#C8102E` | Default. Bold, assertive. Good for CTAs, error states, structural accents. |\n| Cobalt | `#003B8E` | Corporate, technical, trustworthy. Good for data products, enterprise. |\n| Golden | `#F0B429` | Warm, editorial. Good for cultural, food, arts projects. |\n| Forest | `#2D6A4F` | Natural, calm. Good for health, sustainability, outdoor. |",
+      "replace_block": "| Name | Hex | When to use |\n| ---- | --- | ----------- |\n| Deccan Blue | `#164999` | The single Deccan accent. Used for CTAs, links, buttons, active states, structural accents — at multiple opacities (60%/20%/10%) for hierarchy. |\n\n**Note:** Deccan also has a secondary green mark (`#71BF4D`) reserved for the corporate logo and explicit sustainability/environmental content. Never use it as a UI accent in concert with Deccan Blue. See `references/brand-marks.md` for guidance."
+    },
+    {
+      "anchor": "tailwind-config.md multi-accent comment",
+      "context": "Remove the multi-accent override block and replace with Deccan-specific guidance",
+      "find_block": "/* Swap accent globally: just update this block */\n/* \n:root { --accent: #003B8E; }  Cobalt\n:root { --accent: #F0B429; }  Golden\n:root { --accent: #2D6A4F; }  Forest\n*/",
+      "replace_block": "/* Deccan accent is fixed at #164999. Do NOT swap it for another color.\n   For chart/data-viz use, refer to references/data-viz.md (uses the full\n   8-step palette from outputs/palette.json). */"
+    }
+  ]
+}

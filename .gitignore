@@ -34,6 +34,7 @@ data/palette.json
 !data/logo.png
 !data/anchors.json
 !data/pantone-solid-coated.csv
+!data/skill-transformations.json
 
 # Temp clones
 .tmp_swiss/
