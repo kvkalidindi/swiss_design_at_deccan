@@ -4,23 +4,30 @@ A multi-format design system for Deccan Chemicals, built on the foundation of [z
 
 ## Status
 
-Spec drafted. Implementation pending.
+**Plan 1 complete (v0.1.0)** — Color palette + typography foundation shipped.
 
-## Contents
+- `outputs/palette.{json,css,ase,html,md}` — 8-step accent palette in 5 formats
+- `typography/typography.md` — typography stack documentation
+- `typography/substitution-map.json` — canonical font stack (machine-readable)
+- `typography/audit-notes.md` — license audit of upstream swiss-design-skill
+- `fonts/<family>/` — packaged SIL OFL fonts ready for enterprise deployment
 
-- `2026-04-30-deccan-accent-palette-design.md` — Design specification (current)
+### Plan 1 deliverables (8-step accent palette)
 
-## Next Steps
+| | 100 (tint) | 300 (light) | 500 (anchor) | 700 (dark) |
+|---|---|---|---|---|
+| Blue | `#E0E8F5` | `#0EA3DD` | `#164999` | `#0C2956` |
+| Green | `#E9EFE6` | `#A1CB8D` | `#71BF4D` | `#4F8D33` |
 
-1. User review and approval of the spec
-2. Implementation plan (via `superpowers:writing-plans`)
-3. Phased build-out of color tokens, font substitutions, Office themes, and deployment artifacts
+### Plan 1 deliverables (typography)
 
-## Goals
+Primary: **IBM Plex Sans** (display/body/UI), **IBM Plex Mono** (code).
+Fallbacks: Hanken Grotesk, Barlow, Host Grotesk, DM Sans, Fira Code.
+All SIL OFL 1.1 — enterprise-deployable without licensing concerns.
 
-- Brand-derived 8-step accent color palette (4 blue + 4 green steps)
-- Format-agnostic core (hex / RGB / HSL / CMYK / Pantone)
-- Free Google Fonts substitutions for any commercially-licensed Swiss fonts
-- Enterprise-deployable to Windows 11 + Microsoft 365 + Google Workspace fleets
+## Roadmap
 
-See the design spec for full details.
+- **Plan 2** — modify `zeke/swiss-design-skill` to consume these tokens
+- **Plan 3** — Microsoft Office artifacts (.thmx themes, .dotx/.potx/.xltx templates)
+- **Plan 4** — Google Workspace artifacts (Slides/Docs templates, admin gallery)
+- **Plan 5** — Enterprise deployment (Intune profiles, Group Policy, font installation)
