@@ -1,0 +1,51 @@
+{
+  "decision_date": "2026-04-30",
+  "summary": "No substitutions performed. The upstream zeke/swiss-design-skill stack is 100% license-compliant (SIL OFL 1.1 / Apache 2.0). We package the existing fonts as-is for enterprise deployment. See typography/audit-notes.md for detailed verification.",
+  "substitutions": [],
+  "canonical_stack": [
+    {
+      "family": "IBM Plex Sans",
+      "role": "primary-sans",
+      "license": "SIL OFL 1.1",
+      "google_fonts_url": "https://fonts.google.com/specimen/IBM+Plex+Sans",
+      "github": "https://github.com/IBM/plex"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "role": "primary-mono",
+      "license": "SIL OFL 1.1",
+      "google_fonts_url": "https://fonts.google.com/specimen/IBM+Plex+Mono",
+      "github": "https://github.com/IBM/plex"
+    },
+    {
+      "family": "Hanken Grotesk",
+      "role": "sans-fallback",
+      "license": "SIL OFL 1.1",
+      "google_fonts_url": "https://fonts.google.com/specimen/Hanken+Grotesk"
+    },
+    {
+      "family": "Barlow",
+      "role": "sans-fallback",
+      "license": "SIL OFL 1.1",
+      "google_fonts_url": "https://fonts.google.com/specimen/Barlow"
+    },
+    {
+      "family": "Host Grotesk",
+      "role": "sans-fallback",
+      "license": "SIL OFL 1.1",
+      "google_fonts_url": "https://fonts.google.com/specimen/Host+Grotesk"
+    },
+    {
+      "family": "DM Sans",
+      "role": "sans-fallback",
+      "license": "SIL OFL 1.1",
+      "google_fonts_url": "https://fonts.google.com/specimen/DM+Sans"
+    },
+    {
+      "family": "Fira Code",
+      "role": "mono-fallback",
+      "license": "SIL OFL 1.1",
+      "google_fonts_url": "https://fonts.google.com/specimen/Fira+Code"
+    }
+  ]
+}
