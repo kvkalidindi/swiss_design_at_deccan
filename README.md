@@ -66,9 +66,16 @@ Claude Code picks it up automatically on next session.
 
 See `office/README.md` for per-user install. Plan 5 will automate fleet deployment via Intune/GPO.
 
+**Plan 4 complete (v0.4.0)** — Google Workspace setup shipped.
+
+- `gworkspace/gmail-signature.htm` — Gmail-optimized signature (under 10 KB)
+- `gworkspace/README.md` — upload-and-convert setup guide for Slides/Docs/Sheets + Gmail signature install
+
+The Slides/Docs/Sheets templates are reused from `office/templates/` (Google opens OOXML natively).
+
 ## Roadmap
 
 - ~~**Plan 2** — modify `zeke/swiss-design-skill` to consume these tokens~~ **complete (v0.2.0)**
 - ~~**Plan 3** — Microsoft Office artifacts (.thmx themes, .dotx/.potx/.xltx templates)~~ **complete (v0.3.0)**
-- **Plan 4** — Google Workspace artifacts (Slides/Docs templates, admin gallery)
+- ~~**Plan 4** — Google Workspace artifacts (Slides/Docs templates, admin gallery)~~ **complete (v0.4.0)**
 - **Plan 5** — Enterprise deployment (Intune profiles, Group Policy, font installation)
