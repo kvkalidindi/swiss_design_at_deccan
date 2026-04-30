@@ -21,16 +21,40 @@
   ],
   "section_replacements": [
     {
+      "anchor": "SKILL.md accent options table",
+      "context": "Replace 4-option accent table with single Deccan entry in SKILL.md",
+      "find_block": "| Name | Hex | Tailwind arbitrary |\n| ---- | --- | ------------------ |\n| Swiss Red (default) | `#C8102E` | `[#C8102E]` |\n| Cobalt | `#003B8E` | `[#003B8E]` |\n| Golden | `#F0B429` | `[#F0B429]` |\n| Forest | `#2D6A4F` | `[#2D6A4F]` |",
+      "replace_block": "| Name | Hex | Tailwind arbitrary |\n| ---- | --- | ------------------ |\n| Deccan Blue (default) | `#164999` | `[#164999]` |"
+    },
+    {
       "anchor": "design-system.md accent table",
       "context": "Replace 4-option accent table with single Deccan entry plus secondary-mark note",
       "find_block": "| Name | Hex | When to use |\n| ---- | --- | ----------- |\n| Swiss Red | `#C8102E` | Default. Bold, assertive. Good for CTAs, error states, structural accents. |\n| Cobalt | `#003B8E` | Corporate, technical, trustworthy. Good for data products, enterprise. |\n| Golden | `#F0B429` | Warm, editorial. Good for cultural, food, arts projects. |\n| Forest | `#2D6A4F` | Natural, calm. Good for health, sustainability, outdoor. |",
       "replace_block": "| Name | Hex | When to use |\n| ---- | --- | ----------- |\n| Deccan Blue | `#164999` | The single Deccan accent. Used for CTAs, links, buttons, active states, structural accents — at multiple opacities (60%/20%/10%) for hierarchy. |\n\n**Note:** Deccan also has a secondary green mark (`#71BF4D`) reserved for the corporate logo and explicit sustainability/environmental content. Never use it as a UI accent in concert with Deccan Blue. See `references/brand-marks.md` for guidance."
     },
     {
+      "anchor": "design-system.md never section",
+      "context": "Replace two-accent anti-pattern example with single-accent correct example",
+      "find_block": "❌  bg-[#C8102E] text-[#003B8E]  (two accents — pick one)",
+      "replace_block": "❌  bg-[#164999] text--[#0EA3DD]  (two accents — pick one, stick with #164999)"
+    },
+    {
       "anchor": "tailwind-config.md multi-accent comment",
       "context": "Remove the multi-accent override block and replace with Deccan-specific guidance",
       "find_block": "/* Swap accent globally: just update this block */\n/* \n:root { --accent: #003B8E; }  Cobalt\n:root { --accent: #F0B429; }  Golden\n:root { --accent: #2D6A4F; }  Forest\n*/",
       "replace_block": "/* Deccan accent is fixed at #164999. Do NOT swap it for another color.\n   For chart/data-viz use, refer to references/data-viz.md (uses the full\n   8-step palette from outputs/palette.json). */"
+    },
+    {
+      "anchor": "tailwind-config.md switching accent section",
+      "context": "Replace example accent switching guidance for Deccan",
+      "find_block": "To change the accent for a project, update both the CSS variable and the Tailwind arbitrary values:\n\n```css\n:root { --accent: #003B8E; } /* Cobalt */\n```\n\nAnd in your HTML use `bg-[#003B8E]`, `text-[#003B8E]`, `border-[#003B8E]` consistently. Since there is only one accent per project, a global find-replace is safe.",
+      "replace_block": "For Deccan, the accent is fixed at `#164999` (Deccan Blue). Do not swap it for another color.\n\n```css\n:root { --accent: #164999; } /* Deccan Blue */\n```\n\nUse `bg-[#164999]`, `text-[#164999]`, `border-[#164999]` throughout your project. For multi-series charts or data visualizations, refer to `references/data-viz.md` which documents an 8-color palette from `outputs/palette.json`."
+    },
+    {
+      "anchor": "prompting.md accent picker table",
+      "context": "Replace generic accent-picking guidance with Deccan-specific note",
+      "find_block": "| If the project is... | Use |\n| -------------------- | --- |\n| Bold, assertive, commercial | Swiss Red `#C8102E` |\n| Technical, corporate, trustworthy | Cobalt `#003B8E` |\n| Warm, editorial, cultural | Golden `#F0B429` |\n| Natural, calm, sustainable | Forest `#2D6A4F` |\n\n**Commit to one.** If a second color feels necessary, use opacity of the first instead.",
+      "replace_block": "**Deccan always uses Deccan Blue `#164999` as the primary accent.** This is the established brand color and must not be changed."
     }
   ]
 }
