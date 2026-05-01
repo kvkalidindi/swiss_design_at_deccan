@@ -1,10 +1,19 @@
-"""Download chosen Google Fonts (TTF + OFL.txt) into fonts/<family>/."""
+"""Download IBM Plex + 5 fallback fonts from the google/fonts mirror.
+
+Sources are TTFs in the google/fonts repository (raw.githubusercontent.com),
+which is the most stable public source for these OFL'd font files. Each
+download is validated for TTF magic bytes (00 01 00 00, OTTO, or 'true')
+before being written; otherwise the file is rejected and the run fails.
+
+Earlier revisions of this script saved the response of an HTML download form
+into .ttf files, which Office and GlyphTypeface then refused to load. The
+magic-byte check guards against that regression.
+"""
 from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
-from urllib.parse import quote
 
 import requests
 
@@ -12,103 +21,108 @@ ROOT = Path(__file__).resolve().parents[1]
 MAP = ROOT / "typography" / "substitution-map.json"
 OUT = ROOT / "fonts"
 
-# Fallback: Google Fonts API + GitHub mirrors
-# Format: family -> [(filename, google_fonts_family_name, github_license_url)]
-SOURCES = {
-    "IBM Plex Sans": [
-        ("IBMPlexSans-Regular.ttf", "IBM Plex Sans", "https://github.com/IBM/plex/raw/main/LICENSE.txt"),
-        ("IBMPlexSans-Bold.ttf", "IBM Plex Sans", "https://github.com/IBM/plex/raw/main/LICENSE.txt"),
-        ("OFL.txt", "IBM Plex Sans", "https://github.com/IBM/plex/raw/main/LICENSE.txt"),
+_GH = "https://raw.githubusercontent.com/google/fonts/main/ofl"
+
+# family-slug -> [(filename, url)]
+SOURCES: dict[str, list[tuple[str, str]]] = {
+    "ibm-plex-sans": [
+        ("IBMPlexSans-VariableFont.ttf",        f"{_GH}/ibmplexsans/IBMPlexSans%5Bwdth%2Cwght%5D.ttf"),
+        ("IBMPlexSans-Italic-VariableFont.ttf", f"{_GH}/ibmplexsans/IBMPlexSans-Italic%5Bwdth%2Cwght%5D.ttf"),
     ],
-    "IBM Plex Mono": [
-        ("IBMPlexMono-Regular.ttf", "IBM Plex Mono", "https://github.com/IBM/plex/raw/main/LICENSE.txt"),
-        ("IBMPlexMono-Bold.ttf", "IBM Plex Mono", "https://github.com/IBM/plex/raw/main/LICENSE.txt"),
-        ("OFL.txt", "IBM Plex Mono", "https://github.com/IBM/plex/raw/main/LICENSE.txt"),
+    "ibm-plex-mono": [
+        ("IBMPlexMono-Regular.ttf", f"{_GH}/ibmplexmono/IBMPlexMono-Regular.ttf"),
+        ("IBMPlexMono-Bold.ttf",    f"{_GH}/ibmplexmono/IBMPlexMono-Bold.ttf"),
     ],
-    "Hanken Grotesk": [
-        ("HankenGrotesk-VariableFont.ttf", "Hanken Grotesk", "https://github.com/hanken-design/HankenGrotesk/raw/main/OFL.txt"),
-        ("OFL.txt", "Hanken Grotesk", "https://github.com/hanken-design/HankenGrotesk/raw/main/OFL.txt"),
+    "hanken-grotesk": [
+        ("HankenGrotesk-VariableFont.ttf", f"{_GH}/hankengrotesk/HankenGrotesk%5Bwght%5D.ttf"),
     ],
-    "Barlow": [
-        ("Barlow-Regular.ttf", "Barlow", "https://github.com/jpt/barlow/raw/master/OFL.txt"),
-        ("Barlow-Bold.ttf", "Barlow", "https://github.com/jpt/barlow/raw/master/OFL.txt"),
-        ("OFL.txt", "Barlow", "https://github.com/jpt/barlow/raw/master/OFL.txt"),
+    "barlow": [
+        ("Barlow-Regular.ttf", f"{_GH}/barlow/Barlow-Regular.ttf"),
+        ("Barlow-Bold.ttf",    f"{_GH}/barlow/Barlow-Bold.ttf"),
     ],
-    "Host Grotesk": [
-        ("HostGrotesk-VariableFont.ttf", "Host Grotesk", "https://github.com/lettersoup/Host-Grotesk/raw/main/OFL.txt"),
-        ("OFL.txt", "Host Grotesk", "https://github.com/lettersoup/Host-Grotesk/raw/main/OFL.txt"),
+    "host-grotesk": [
+        ("HostGrotesk-VariableFont.ttf", f"{_GH}/hostgrotesk/HostGrotesk%5Bwght%5D.ttf"),
     ],
-    "DM Sans": [
-        ("DMSans-VariableFont.ttf", "DM Sans", "https://github.com/googlefonts/dm-fonts/raw/master/Sans/OFL.txt"),
-        ("OFL.txt", "DM Sans", "https://github.com/googlefonts/dm-fonts/raw/master/Sans/OFL.txt"),
+    "dm-sans": [
+        ("DMSans-VariableFont.ttf", f"{_GH}/dmsans/DMSans%5Bopsz%2Cwght%5D.ttf"),
     ],
-    "Fira Code": [
-        ("FiraCode-VariableFont.ttf", "Fira Code", "https://github.com/tonsky/FiraCode/raw/master/LICENSE"),
-        ("OFL.txt", "Fira Code", "https://github.com/tonsky/FiraCode/raw/master/LICENSE"),
+    "fira-code": [
+        ("FiraCode-VariableFont.ttf", f"{_GH}/firacode/FiraCode%5Bwght%5D.ttf"),
     ],
 }
 
+# Family-slug -> license file URL.
+LICENSE_URLS: dict[str, str] = {
+    "ibm-plex-sans":  f"{_GH}/ibmplexsans/OFL.txt",
+    "ibm-plex-mono":  f"{_GH}/ibmplexmono/OFL.txt",
+    "hanken-grotesk": f"{_GH}/hankengrotesk/OFL.txt",
+    "barlow":         f"{_GH}/barlow/OFL.txt",
+    "host-grotesk":   f"{_GH}/hostgrotesk/OFL.txt",
+    "dm-sans":        f"{_GH}/dmsans/OFL.txt",
+    "fira-code":      f"{_GH}/firacode/OFL.txt",
+}
 
-def _slug(family: str) -> str:
-    return family.lower().replace(" ", "-")
+
+def is_valid_ttf(data: bytes) -> bool:
+    if len(data) < 4:
+        return False
+    head = data[:4]
+    return head in (b"\x00\x01\x00\x00", b"OTTO", b"true")
 
 
-def _fetch_from_google_fonts_api(family: str) -> bytes | None:
-    """Try to fetch font from Google Fonts API."""
-    try:
-        url = f"https://fonts.google.com/download?family={quote(family)}"
-        r = requests.get(url, timeout=60, allow_redirects=True)
-        r.raise_for_status()
-        return r.content
-    except Exception as e:
-        print(f"    Google Fonts API unavailable: {e}", file=sys.stderr)
-        return None
+def fetch_binary(url: str) -> bytes:
+    r = requests.get(url, timeout=60, allow_redirects=True)
+    r.raise_for_status()
+    return r.content
 
 
 def main() -> int:
+    # The substitution map drives which families we package; the SOURCES table
+    # provides the URLs. If a substitution-map family lacks a SOURCES entry,
+    # warn and skip (rather than silently producing a placeholder).
     sub = json.loads(MAP.read_text(encoding="utf-8"))
-    families = [s["family"] for s in sub["canonical_stack"]]
-    overall_ok = True
-    for fam in families:
-        if fam not in SOURCES:
-            print(f"WARN: no SOURCES entry for {fam}", file=sys.stderr)
-            overall_ok = False
+    requested = {
+        s["family"].lower().replace(" ", "-"): s["family"]
+        for s in sub["canonical_stack"]
+    }
+    fail = 0
+    for slug, family in requested.items():
+        if slug not in SOURCES:
+            print(f"WARN: no SOURCES entry for {family} ({slug}); skipping", file=sys.stderr)
+            fail += 1
             continue
-        dest = OUT / _slug(fam)
+        dest = OUT / slug
         dest.mkdir(parents=True, exist_ok=True)
-        for filename, gf_family, license_url in SOURCES[fam]:
-            print(f"  -> {fam}/{filename}")
+        # Fonts
+        for filename, url in SOURCES[slug]:
+            print(f"  -> {slug}/{filename}")
             try:
-                if filename == "OFL.txt":
-                    # Try to fetch license file from GitHub
-                    r = requests.get(license_url, timeout=60, allow_redirects=True)
-                    r.raise_for_status()
-                    (dest / filename).write_bytes(r.content)
-                else:
-                    # Try Google Fonts API
-                    content = _fetch_from_google_fonts_api(gf_family)
-                    if content:
-                        (dest / filename).write_bytes(content)
-                    else:
-                        raise requests.exceptions.RequestException(
-                            "Could not fetch from Google Fonts"
-                        )
-            except requests.exceptions.RequestException as exc:
-                print(f"    FAILED ({exc})", file=sys.stderr)
-                # Create placeholder with download instructions
-                placeholder = (
-                    f"# Font file placeholder: {filename}\n\n"
-                    f"Family: {fam}\n"
-                    f"Download from: https://fonts.google.com/specimen/{quote(fam.replace(' ', '+'))}\n\n"
-                    f"To use this font:\n"
-                    f"1. Visit the URL above\n"
-                    f"2. Download the TTF files\n"
-                    f"3. Place in this directory: {dest}\n\n"
-                )
-                (dest / filename).write_text(placeholder, encoding="utf-8")
-                overall_ok = False
-    print("Done." if overall_ok else "Done with placeholders (see above).")
-    return 0 if overall_ok else 1
+                data = fetch_binary(url)
+                if not is_valid_ttf(data):
+                    print(
+                        f"    REJECTED: not a valid TTF (first 4 bytes: {data[:4]!r}, {len(data)} bytes total)",
+                        file=sys.stderr,
+                    )
+                    fail += 1
+                    continue
+                (dest / filename).write_bytes(data)
+                print(f"    OK ({len(data):,} bytes)")
+            except Exception as exc:
+                print(f"    FAILED: {exc}", file=sys.stderr)
+                fail += 1
+        # License
+        if slug in LICENSE_URLS:
+            license_path = dest / "OFL.txt"
+            try:
+                data = fetch_binary(LICENSE_URLS[slug])
+                license_path.write_bytes(data)
+                print(f"  -> {slug}/OFL.txt OK ({len(data):,} bytes)")
+            except Exception as exc:
+                print(f"  -> {slug}/OFL.txt FAILED: {exc}", file=sys.stderr)
+                fail += 1
+    print()
+    print(f"Done. {len(requested)} families processed; {fail} failures.")
+    return 0 if fail == 0 else 1
 
 
 if __name__ == "__main__":
