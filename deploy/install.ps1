@@ -149,9 +149,11 @@ if ($Uninstall) {
         Write-Host "Fonts:"
         Write-Step "Invoking install-fonts.ps1 -Uninstall ($FontScopeLabel)"
         if (-not $DryRun) {
-            $argsList = @("-Uninstall", "-NoPause")
-            if ($PerUser) { $argsList += "-PerUser" }
-            & (Join-Path $ScriptRoot "install-fonts.ps1") @argsList
+            # Use hashtable splatting so switches bind by NAME (array splatting
+            # would treat each "-X" string as a positional value).
+            $splat = @{ Uninstall = $true; NoPause = $true }
+            if ($PerUser) { $splat.PerUser = $true }
+            & (Join-Path $ScriptRoot "install-fonts.ps1") @splat
         }
     }
 
@@ -170,9 +172,11 @@ if ($DoFonts) {
     Write-Host "Fonts:"
     Write-Step "Invoking install-fonts.ps1 ($FontScopeLabel)"
     if (-not $DryRun) {
-        $argsList = @("-NoPause")
-        if ($PerUser) { $argsList += "-PerUser" }
-        & (Join-Path $ScriptRoot "install-fonts.ps1") @argsList
+        # Use hashtable splatting so switches bind by NAME (array splatting
+        # would treat each "-X" string as a positional value).
+        $splat = @{ NoPause = $true }
+        if ($PerUser) { $splat.PerUser = $true }
+        & (Join-Path $ScriptRoot "install-fonts.ps1") @splat
         if ($LASTEXITCODE -ne 0) {
             # install-fonts emitted its own admin/elevation guidance; stop here.
             Write-Host ""

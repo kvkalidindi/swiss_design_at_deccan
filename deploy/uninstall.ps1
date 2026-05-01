@@ -37,12 +37,15 @@ param(
 $ScriptRoot = $PSScriptRoot
 if (-not $ScriptRoot) { $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path }
 
-$argsList = @("-Uninstall")
-if ($PerUser) { $argsList += "-PerUser" }
-if ($SystemWide) { $argsList += "-SystemWide" }
-if ($DryRun) { $argsList += "-DryRun" }
-if ($OnlyFonts) { $argsList += "-OnlyFonts" }
-if ($OnlyTemplates) { $argsList += "-OnlyTemplates" }
-if ($OnlyRegistry) { $argsList += "-OnlyRegistry" }
+# Hashtable splatting (not array) so each switch binds by NAME. Array
+# splatting would treat each "-X" string as a positional value and the
+# CmdletBinding-decorated install.ps1 would reject it.
+$splat = @{ Uninstall = $true }
+if ($PerUser)       { $splat.PerUser       = $true }
+if ($SystemWide)    { $splat.SystemWide    = $true }
+if ($DryRun)        { $splat.DryRun        = $true }
+if ($OnlyFonts)     { $splat.OnlyFonts     = $true }
+if ($OnlyTemplates) { $splat.OnlyTemplates = $true }
+if ($OnlyRegistry)  { $splat.OnlyRegistry  = $true }
 
-& (Join-Path $ScriptRoot "install.ps1") @argsList
+& (Join-Path $ScriptRoot "install.ps1") @splat
