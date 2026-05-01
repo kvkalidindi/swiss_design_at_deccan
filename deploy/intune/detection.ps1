@@ -31,7 +31,7 @@ if (-not $validateScript) {
     exit 1
 }
 
-$null = & $validateScript *>&1
+$null = & $validateScript -NoPause *>&1
 if ($LASTEXITCODE -eq 0) {
     Write-Output "Deccan design system installed and validated."
     exit 0

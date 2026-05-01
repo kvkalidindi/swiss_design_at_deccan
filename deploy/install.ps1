@@ -4,14 +4,23 @@
     Install the full Deccan Chemicals design system on this PC.
 
 .DESCRIPTION
-    Installs IBM Plex fonts, Office theme + 3 templates, and configures Office to
-    discover the templates via HKCU PersonalTemplates registry keys.
+    Installs IBM Plex fonts, the Office theme + 3 templates, and the HKCU
+    PersonalTemplates registry keys that make Office discover them.
 
-    By default everything is per-user (no admin needed). -SystemWide installs fonts
-    machine-wide (admin required); other artifacts remain per-user.
+    Default scope is **system-wide** for fonts (C:\Windows\Fonts), which is
+    where Office 365 reliably picks them up. Requires Administrator. Use
+    -PerUser to install fonts at user level instead (no admin needed, less
+    reliable for some Office configurations).
+
+    Office templates and registry keys are always per-user (HKCU + %APPDATA%);
+    they don't need admin.
+
+.PARAMETER PerUser
+    Install fonts at user level (%LOCALAPPDATA%\Microsoft\Windows\Fonts).
+    No admin required. Default behavior installs fonts to C:\Windows\Fonts.
 
 .PARAMETER SystemWide
-    Install fonts to C:\Windows\Fonts. Requires admin.
+    Deprecated: this is now the default. Kept for backwards compatibility.
 
 .PARAMETER Uninstall
     Reverse everything: remove fonts, Office artifacts, and registry keys.
@@ -32,20 +41,26 @@
     Only set/clear registry keys; skip fonts and Office artifacts.
 
 .EXAMPLE
+    # Default install: system-wide fonts + per-user templates + per-user registry.
+    # Run from an elevated PowerShell.
     .\install.ps1
-    Per-user install of everything.
+
+.EXAMPLE
+    # Install fonts at user level (no admin needed)
+    .\install.ps1 -PerUser
 
 .EXAMPLE
     .\install.ps1 -DryRun
-    Show what would happen.
+    # Show what would happen, change nothing.
 
 .EXAMPLE
     .\install.ps1 -Uninstall
-    Reverse a previous install.
+    # Reverse a previous install.
 #>
 [CmdletBinding()]
 param(
-    [switch]$SystemWide,
+    [switch]$PerUser,
+    [switch]$SystemWide,    # deprecated alias; kept for compatibility
     [switch]$Uninstall,
     [switch]$DryRun,
     [switch]$Validate,
@@ -59,8 +74,16 @@ $ScriptRoot = $PSScriptRoot
 if (-not $ScriptRoot) { $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path }
 $ProjectRoot = Resolve-Path (Join-Path $ScriptRoot "..")
 
+function Pause-Before-Exit {
+    if (-not [Environment]::UserInteractive) { return }
+    Write-Host ""
+    Write-Host "Press Enter to close this window..." -ForegroundColor Cyan
+    [void](Read-Host)
+}
+
 if ($Validate) {
-    & (Join-Path $ScriptRoot "validate.ps1")
+    & (Join-Path $ScriptRoot "validate.ps1") -NoPause
+    Pause-Before-Exit
     return
 }
 
@@ -92,8 +115,11 @@ function Write-Step {
     }
 }
 
+$FontScopeLabel = if ($PerUser) { "Per-user" } else { "System-wide (C:\Windows\Fonts)" }
+
 if ($Uninstall) {
     Write-Host "Uninstalling Deccan design system..." -ForegroundColor Yellow
+    Write-Host "  Font scope being removed: $FontScopeLabel"
 
     if ($DoTemplates) {
         Write-Host "Templates:"
@@ -121,10 +147,10 @@ if ($Uninstall) {
 
     if ($DoFonts) {
         Write-Host "Fonts:"
-        Write-Step "Invoking install-fonts.ps1 -Uninstall $(if ($SystemWide) { '-SystemWide' })"
+        Write-Step "Invoking install-fonts.ps1 -Uninstall ($FontScopeLabel)"
         if (-not $DryRun) {
-            $argsList = @("-Uninstall")
-            if ($SystemWide) { $argsList += "-SystemWide" }
+            $argsList = @("-Uninstall", "-NoPause")
+            if ($PerUser) { $argsList += "-PerUser" }
             & (Join-Path $ScriptRoot "install-fonts.ps1") @argsList
         }
     }
@@ -132,20 +158,28 @@ if ($Uninstall) {
     Write-Host ""
     Write-Host "Uninstall complete." -ForegroundColor Green
     Write-Host "Restart any open Office apps to refresh."
+    Pause-Before-Exit
     return
 }
 
 Write-Host "Installing Deccan design system..." -ForegroundColor Cyan
-Write-Host "  Scope: $(if ($SystemWide) { 'System-wide' } else { 'Per-user' })"
+Write-Host "  Font scope: $FontScopeLabel"
 Write-Host ""
 
 if ($DoFonts) {
     Write-Host "Fonts:"
-    Write-Step "Invoking install-fonts.ps1 $(if ($SystemWide) { '-SystemWide' })"
+    Write-Step "Invoking install-fonts.ps1 ($FontScopeLabel)"
     if (-not $DryRun) {
-        $argsList = @()
-        if ($SystemWide) { $argsList += "-SystemWide" }
+        $argsList = @("-NoPause")
+        if ($PerUser) { $argsList += "-PerUser" }
         & (Join-Path $ScriptRoot "install-fonts.ps1") @argsList
+        if ($LASTEXITCODE -ne 0) {
+            # install-fonts emitted its own admin/elevation guidance; stop here.
+            Write-Host ""
+            Write-Host "Font install did not succeed. Stopping." -ForegroundColor Red
+            Pause-Before-Exit
+            exit $LASTEXITCODE
+        }
     }
 }
 
@@ -189,4 +223,5 @@ Write-Host "  3. For Outlook signature: open office\templates\signature.htm in b
 Write-Host "  4. For Gmail signature: open gworkspace\gmail-signature.html in browser, copy, paste into Gmail signature settings."
 Write-Host ""
 Write-Host "To audit the install: .\install.ps1 -Validate"
-Write-Host "To reverse: .\install.ps1 -Uninstall"
+Write-Host "To reverse:           .\install.ps1 -Uninstall"
+Pause-Before-Exit
