@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   revision="1.0" schemaVersion="1.0"
+                   xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <policyNamespaces>
+    <target prefix="deccanDesign" namespace="DeccanChemicals.Policies.DesignSystem" />
+    <using prefix="windows" namespace="Microsoft.Policies.Windows" />
+  </policyNamespaces>
+  <resources minRequiredRevision="1.0" />
+  <categories>
+    <category name="DeccanDesignSystem" displayName="$(string.Cat_DeccanDesignSystem)" />
+  </categories>
+  <policies>
+    <policy name="WordPersonalTemplates" class="User" displayName="$(string.Pol_WordPersonalTemplates)"
+            explainText="$(string.Pol_WordPersonalTemplates_Explain)"
+            key="Software\Microsoft\Office\16.0\Word\Options"
+            valueName="PersonalTemplates">
+      <parentCategory ref="DeccanDesignSystem" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <text id="WordPersonalTemplates_Path" valueName="PersonalTemplates" expandable="true" />
+      </elements>
+    </policy>
+    <policy name="PowerPointPersonalTemplates" class="User" displayName="$(string.Pol_PowerPointPersonalTemplates)"
+            explainText="$(string.Pol_PowerPointPersonalTemplates_Explain)"
+            key="Software\Microsoft\Office\16.0\PowerPoint\Options"
+            valueName="PersonalTemplates">
+      <parentCategory ref="DeccanDesignSystem" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <text id="PowerPointPersonalTemplates_Path" valueName="PersonalTemplates" expandable="true" />
+      </elements>
+    </policy>
+    <policy name="ExcelPersonalTemplates" class="User" displayName="$(string.Pol_ExcelPersonalTemplates)"
+            explainText="$(string.Pol_ExcelPersonalTemplates_Explain)"
+            key="Software\Microsoft\Office\16.0\Excel\Options"
+            valueName="PersonalTemplates">
+      <parentCategory ref="DeccanDesignSystem" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <text id="ExcelPersonalTemplates_Path" valueName="PersonalTemplates" expandable="true" />
+      </elements>
+    </policy>
+  </policies>
+</policyDefinitions>

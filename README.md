@@ -73,9 +73,32 @@ See `office/README.md` for per-user install. Plan 5 will automate fleet deployme
 
 The Slides/Docs/Sheets templates are reused from `office/templates/` (Google opens OOXML natively).
 
+**Plan 5 complete (v0.5.0)** — Enterprise deployment bundle shipped.
+
+- `deploy/install.ps1` — top-level orchestrator (fonts + Office artifacts + registry); per-user by default, `-SystemWide` for admin, `-Uninstall` / `-DryRun` / `-Validate` flags
+- `deploy/install-fonts.ps1` — IBM Plex font installer
+- `deploy/uninstall.ps1` — rollback wrapper
+- `deploy/validate.ps1` — 9-check audit (fonts + artifacts + registry)
+- `deploy/intune/` — Intune Win32 app artifacts (detection script + metadata + README)
+- `deploy/gpo/` — Group Policy ADMX/ADML templates + README
+- `deploy/README.md` — comprehensive end-user docs
+
+A solo developer runs `.\deploy\install.ps1` and is fully set up. IT teams adapt for fleet rollout via Intune (modern) or Group Policy (legacy).
+
+**Project status: complete.** All 5 plans shipped. Each layer (palette, skill, Office, Workspace, deployment) is independently usable, regenerable, testable.
+
 ## Roadmap
 
 - ~~**Plan 2** — modify `zeke/swiss-design-skill` to consume these tokens~~ **complete (v0.2.0)**
 - ~~**Plan 3** — Microsoft Office artifacts (.thmx themes, .dotx/.potx/.xltx templates)~~ **complete (v0.3.0)**
 - ~~**Plan 4** — Google Workspace artifacts (Slides/Docs templates, admin gallery)~~ **complete (v0.4.0)**
-- **Plan 5** — Enterprise deployment (Intune profiles, Group Policy, font installation)
+- ~~**Plan 5** — Enterprise deployment (Intune profiles, Group Policy, font installation)~~ **complete (v0.5.0)**
+
+## Project complete
+
+All five plans shipped. The design system is now end-to-end: from logo extraction through enterprise-deployable artifacts.
+
+Future evolution paths (not on the original roadmap):
+- Native Google Workspace API generation (option B from Plan 4 brainstorm) if conversion fidelity is insufficient
+- True font embedding inside Office templates (requires deep OOXML manipulation; deferred from Plan 3)
+- Status-indicator color palette (success/warning/info/error) — explicitly out of the original 8-step accent scope

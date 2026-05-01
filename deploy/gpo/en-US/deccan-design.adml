@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                           revision="1.0" schemaVersion="1.0"
+                           xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>Deccan Design System Policies</displayName>
+  <description>Group Policy templates for deploying the Deccan Chemicals design system.</description>
+  <resources>
+    <stringTable>
+      <string id="Cat_DeccanDesignSystem">Deccan Design System</string>
+      <string id="Pol_WordPersonalTemplates">Word: Personal Templates Path</string>
+      <string id="Pol_WordPersonalTemplates_Explain">Sets HKCU Software\Microsoft\Office\16.0\Word\Options\PersonalTemplates so Word's File > New > Personal tab discovers Deccan templates. Recommended value: %APPDATA%\Microsoft\Templates</string>
+      <string id="Pol_PowerPointPersonalTemplates">PowerPoint: Personal Templates Path</string>
+      <string id="Pol_PowerPointPersonalTemplates_Explain">Sets HKCU Software\Microsoft\Office\16.0\PowerPoint\Options\PersonalTemplates so PowerPoint discovers Deccan templates. Recommended value: %APPDATA%\Microsoft\Templates</string>
+      <string id="Pol_ExcelPersonalTemplates">Excel: Personal Templates Path</string>
+      <string id="Pol_ExcelPersonalTemplates_Explain">Sets HKCU Software\Microsoft\Office\16.0\Excel\Options\PersonalTemplates so Excel discovers Deccan templates. Recommended value: %APPDATA%\Microsoft\Templates</string>
+    </stringTable>
+  </resources>
+</policyDefinitionResources>
