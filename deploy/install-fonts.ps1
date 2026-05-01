@@ -113,11 +113,23 @@ if (-not (Test-Path $RegHive)) {
     New-Item -Path $RegHive -Force | Out-Null
 }
 
-# Source font files (Plan 1 deliverable)
-$FontSources = @(
-    Join-Path $ProjectRoot "fonts\ibm-plex-sans"
-    Join-Path $ProjectRoot "fonts\ibm-plex-mono"
-)
+# Source font files (Plan 1 deliverable). Auto-enumerates every directory
+# under <project>/fonts/ that contains at least one .ttf, so adding a new
+# font family just means dropping its TTFs into a new fonts/<family>/ dir
+# without touching this script.
+$FontsRoot = Join-Path $ProjectRoot "fonts"
+$FontSources = @()
+if (Test-Path $FontsRoot) {
+    $FontSources = Get-ChildItem $FontsRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object {
+            (Get-ChildItem $_.FullName -Filter *.ttf -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0
+        } |
+        Sort-Object Name |
+        ForEach-Object { $_.FullName }
+}
+if ($FontSources.Count -eq 0) {
+    Write-Warning "No font directories with TTFs found under $FontsRoot."
+}
 
 function Get-FontDisplayName {
     param([string]$TtfPath)
@@ -205,11 +217,20 @@ if ($Uninstall) {
     Write-Host "  Scope: $Scope"
     Write-Host "  Source dir: $FontDir"
     foreach ($src in $FontSources) {
-        if (Test-Path $src) {
-            Get-ChildItem $src -Filter *.ttf | ForEach-Object {
-                $name = Uninstall-OneFont -TtfPath $_.FullName -FontDir $FontDir -RegHive $RegHive
-                if ($name) { Write-Host "  Removed: $name" }
+        if (-not (Test-Path $src)) { continue }
+        $famSlug = Split-Path $src -Leaf
+        Write-Host ""
+        Write-Host "  Family: $famSlug"
+        $famRemoved = 0
+        Get-ChildItem $src -Filter *.ttf | ForEach-Object {
+            $name = Uninstall-OneFont -TtfPath $_.FullName -FontDir $FontDir -RegHive $RegHive
+            if ($name) {
+                Write-Host "    Removed: $name"
+                $famRemoved++
             }
+        }
+        if ($famRemoved -eq 0) {
+            Write-Host "    (nothing to remove)" -ForegroundColor DarkGray
         }
     }
     Write-Host ""
@@ -222,21 +243,39 @@ if ($Uninstall) {
 Write-Host "Installing Deccan fonts..." -ForegroundColor Cyan
 Write-Host "  Scope: $Scope"
 Write-Host "  Destination: $FontDir"
+Write-Host "  Families found in repo:" ($FontSources | ForEach-Object { Split-Path $_ -Leaf }) -ForegroundColor DarkGray
 $installedCount = 0
 $skippedCount = 0
+$familyResults = @()
 foreach ($src in $FontSources) {
     if (-not (Test-Path $src)) {
         Write-Warning "Missing font source: $src - skipping"
         continue
     }
+    $famSlug = Split-Path $src -Leaf
+    Write-Host ""
+    Write-Host "  Family: $famSlug"
+    $famInstalled = 0
+    $famSkipped = 0
     Get-ChildItem $src -Filter *.ttf | ForEach-Object {
         $name = Install-OneFont -TtfPath $_.FullName -FontDir $FontDir -RegHive $RegHive
         if ($name) {
-            Write-Host "  Installed: $name"
+            Write-Host "    Installed: $name"
             $installedCount++
+            $famInstalled++
         } else {
             $skippedCount++
+            $famSkipped++
         }
+    }
+    $famTotal = $famInstalled + $famSkipped
+    $color = if ($famSkipped -eq 0) { "Green" } else { "Yellow" }
+    Write-Host ("    Family summary: {0}/{1} files installed" -f $famInstalled, $famTotal) -ForegroundColor $color
+    $familyResults += [pscustomobject]@{
+        Family    = $famSlug
+        Installed = $famInstalled
+        Skipped   = $famSkipped
+        Total     = $famTotal
     }
 }
 
@@ -270,6 +309,22 @@ try {
 }
 
 Write-Host ""
-Write-Host "Install complete: $installedCount installed, $skippedCount skipped." -ForegroundColor Green
+Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host "  Family-by-family summary" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan
+foreach ($r in $familyResults) {
+    $marker = if ($r.Skipped -eq 0) { "[OK]   " } else { "[WARN] " }
+    $color  = if ($r.Skipped -eq 0) { "Green" } else { "Yellow" }
+    $line   = "{0}{1,-20} {2}/{3} files" -f $marker, $r.Family, $r.Installed, $r.Total
+    Write-Host $line -ForegroundColor $color
+}
+Write-Host ""
+Write-Host "Install complete: $installedCount installed, $skippedCount skipped (across $($familyResults.Count) families)." -ForegroundColor Green
+if ($skippedCount -gt 0) {
+    Write-Host ""
+    Write-Host "Some files were skipped (most commonly because Office/font-previewer had them locked)." -ForegroundColor Yellow
+    Write-Host "Close Word/PowerPoint/Excel and re-run this script if any family shows < full coverage."
+}
+Write-Host ""
 Write-Host "Office windows that were open at install time should be closed and reopened to pick up the new fonts."
 Pause-IfTopLevel

@@ -57,16 +57,27 @@ function Pause-Before-Exit {
 # fonts: report which directory the family lives in
 Add-Type -AssemblyName PresentationCore -ErrorAction SilentlyContinue
 function Get-FontFamilyLocation {
-    param([string]$FamilyName)
+    param(
+        [string]$FamilyName,
+        [string]$FilenameHint = ""   # e.g. "DMSans" - matched if GlyphTypeface fails
+    )
     foreach ($dir in @($SysFontsDir, $UserFontsDir)) {
         if (-not (Test-Path $dir)) { continue }
         $hit = Get-ChildItem $dir -Filter *.ttf -ErrorAction SilentlyContinue | Where-Object {
+            $matched = $false
             try {
                 $uri = New-Object System.Uri($_.FullName)
                 $gt = New-Object System.Windows.Media.GlyphTypeface($uri)
                 $fam = $gt.Win32FamilyNames["en-us"]
-                $fam -eq $FamilyName
-            } catch { $false }
+                if ($fam -eq $FamilyName) { $matched = $true }
+            } catch {
+                # GlyphTypeface throws on some variable fonts (DM Sans etc.).
+                # Fall through to the filename hint match below.
+            }
+            if (-not $matched -and $FilenameHint) {
+                if ($_.Name -like "*$FilenameHint*") { $matched = $true }
+            }
+            $matched
         } | Select-Object -First 1
         if ($hit) {
             $scope = if ($dir -eq $SysFontsDir) { "system-wide" } else { "per-user" }
@@ -76,8 +87,69 @@ function Get-FontFamilyLocation {
     return @{ Found = $false; Scope = ""; Path = "" }
 }
 
-foreach ($family in @("IBM Plex Sans", "IBM Plex Mono")) {
-    $loc = Get-FontFamilyLocation -FamilyName $family
+# Filename-hint table for GlyphTypeface-fallback lookups. Keys are display
+# names; values are the prefix used in TTF filenames downloaded from
+# google/fonts.
+$FilenameHints = @{
+    "IBM Plex Sans"  = "IBMPlexSans"
+    "IBM Plex Mono"  = "IBMPlexMono"
+    "Hanken Grotesk" = "HankenGrotesk"
+    "Barlow"         = "Barlow"
+    "Host Grotesk"   = "HostGrotesk"
+    "DM Sans"        = "DMSans"
+    "Fira Code"      = "FiraCode"
+}
+
+# Derive the expected font families from the repo's fonts/ directory.
+# We try to read the family name out of one TTF per family folder. WPF's
+# GlyphTypeface throws on some variable fonts (e.g. DMSans) where optional
+# name-table entries are missing - for those we fall back to a slug→name
+# map keyed on the directory name.
+$RepoFontsRoot = Join-Path (Split-Path $PSScriptRoot -Parent) "fonts"
+$SlugToFamily = @{
+    "ibm-plex-sans"  = "IBM Plex Sans"
+    "ibm-plex-mono"  = "IBM Plex Mono"
+    "hanken-grotesk" = "Hanken Grotesk"
+    "barlow"         = "Barlow"
+    "host-grotesk"   = "Host Grotesk"
+    "dm-sans"        = "DM Sans"
+    "fira-code"      = "Fira Code"
+}
+$ExpectedFamilies = @()
+if (Test-Path $RepoFontsRoot) {
+    Get-ChildItem $RepoFontsRoot -Directory -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object {
+        $dirName = $_.Name
+        $sample = Get-ChildItem $_.FullName -Filter *.ttf -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $sample) { return }
+        $fam = $null
+        try {
+            $uri = New-Object System.Uri($sample.FullName)
+            $gt = New-Object System.Windows.Media.GlyphTypeface($uri)
+            $fam = $gt.Win32FamilyNames["en-us"]
+            if (-not $fam) { $fam = ($gt.Win32FamilyNames.Values | Select-Object -First 1) }
+        } catch {
+            $fam = $null
+        }
+        if (-not $fam) {
+            # GlyphTypeface couldn't read this TTF; use the slug→name map.
+            $fam = $SlugToFamily[$dirName]
+        }
+        if (-not $fam) {
+            # Last resort: title-case the directory name.
+            $fam = (Get-Culture).TextInfo.ToTitleCase($dirName.Replace("-", " "))
+        }
+        $ExpectedFamilies += $fam
+    }
+}
+if ($ExpectedFamilies.Count -eq 0) {
+    # Fallback if no fonts/ directory is found
+    $ExpectedFamilies = @("IBM Plex Sans", "IBM Plex Mono")
+}
+
+foreach ($family in $ExpectedFamilies) {
+    $hint = $FilenameHints[$family]
+    if (-not $hint) { $hint = "" }
+    $loc = Get-FontFamilyLocation -FamilyName $family -FilenameHint $hint
     if ($loc.Found) {
         Add-Check "$family installed" $true "$($loc.Scope) at $($loc.Path)"
     } else {
