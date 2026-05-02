@@ -282,15 +282,22 @@ foreach ($src in $FontSources) {
 # Notify Windows that the font collection changed (broadcasts WM_FONTCHANGE)
 # so currently-running apps refresh their font lists. Without this, you must
 # log out / restart Word for new fonts to appear.
+# Use SendMessageTimeout for the HWND_BROADCAST: plain SendMessage waits for
+# every top-level window in every session to ACK and will hang the script if
+# any one of them is unresponsive (Office loading, stuck font previewer, etc.).
 Add-Type -ErrorAction SilentlyContinue @"
 using System;
 using System.Runtime.InteropServices;
 public static class FontNotify {
     [DllImport("gdi32.dll")] public static extern int AddFontResourceW(string lpFilename);
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern int SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern IntPtr SendMessageTimeoutW(
+        IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam,
+        uint fuFlags, uint uTimeout, out IntPtr lpdwResult);
     public static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
     public const uint WM_FONTCHANGE = 0x001D;
+    public const uint SMTO_ABORTIFHUNG = 0x0002;
+    public const uint SMTO_NOTIMEOUTIFNOTHUNG = 0x0008;
 }
 "@
 try {
@@ -303,7 +310,14 @@ try {
             }
         }
     }
-    [void][FontNotify]::SendMessage([FontNotify]::HWND_BROADCAST, [FontNotify]::WM_FONTCHANGE, [IntPtr]::Zero, [IntPtr]::Zero)
+    $result = [IntPtr]::Zero
+    [void][FontNotify]::SendMessageTimeoutW(
+        [FontNotify]::HWND_BROADCAST,
+        [FontNotify]::WM_FONTCHANGE,
+        [IntPtr]::Zero, [IntPtr]::Zero,
+        ([FontNotify]::SMTO_ABORTIFHUNG -bor [FontNotify]::SMTO_NOTIMEOUTIFNOTHUNG),
+        2000,
+        [ref]$result)
 } catch {
     # Non-fatal: font is still installed; just won't refresh in already-running apps.
 }
