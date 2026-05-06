@@ -168,3 +168,28 @@ When in doubt, include the furniture. Brand presence is cheap; absence is conspi
 | PDF | Carried over from the source doc | Carried over | Carried over | Carried over |
 
 PDFs are not authored directly — they're exports of the Office formats — so applying furniture to the source files automatically propagates to the PDF.
+
+---
+
+## Rendering and verifying templates
+
+To visually verify a generated `.dotx` / `.potx` / `.xltx`, render it to PDF and open the PDF.
+
+**Recommended path (deterministic, no automation surprises):**
+
+1. Open the template in the corresponding Office app (Word, PowerPoint, Excel).
+2. **File → Export → Create PDF/XPS** (or **File → Save As → PDF**).
+3. Save into `outputs/template_previews/` (gitignored).
+
+**Why not COM automation?** On managed corporate Windows installs (this user's environment included), `Word.Application` / `PowerPoint.Application` / `Excel.Application` COM objects can hang silently on first launch waiting for a Trust Center prompt, license activation, or first-run dialog that never reaches the foreground because `Visible = $false`. The render call appears to "work" but never returns. If you must automate, use **LibreOffice headless** (`soffice --headless --convert-to pdf <file>`) or **`libreoffice` in WSL** instead, both of which are deterministic and dialog-free.
+
+**What to look for in the rendered PDF:**
+
+- Cover page is page 1 with no header/footer/page number.
+- Body content begins on page 2.
+- Header (logo + title) and footer ("Deccan Chemicals · Confidential" + "Page X of Y") appear on every body page.
+- No heading lands in the bottom 25% of any page.
+- End page is the final page, alone, with no header/footer/page number.
+- Live content area is at least 80% of paper width.
+
+If any of these fail, the regression is in the emitter (`scripts/lib/office_*.py`), not the document — fix the source and re-emit.

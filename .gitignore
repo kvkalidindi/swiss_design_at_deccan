@@ -38,3 +38,12 @@ data/palette.json
 
 # Temp clones
 .tmp_swiss/
+
+# Office lock files (Word/Excel/PowerPoint create these when a doc is open)
+~$*
+
+# Local-only template previews (PDFs rendered for visual verification)
+outputs/template_previews/
+
+# Deploy run logs (generated locally)
+deploy/_elevated_run.log
