@@ -280,3 +280,6 @@ After applying Swiss styling, fetch the rules above and audit the result for acc
 | Tailwind component patterns: buttons, cards, nav, forms, badges | `references/components.md` |
 | Paste-ready `tailwind.config.js` and CSS `@theme` block | `references/tailwind-config.md` |
 | Applying this system to an existing page, audit checklist | `references/prompting.md` |
+| Multi-series chart palette and data-viz rules | `references/data-viz.md` |
+| Secondary green mark — when (and when not) to use `#71BF4D` | `references/brand-marks.md` |
+| Headers, footers, cover and end pages for Word/PowerPoint/Excel/PDF | `references/document-furniture.md` |
