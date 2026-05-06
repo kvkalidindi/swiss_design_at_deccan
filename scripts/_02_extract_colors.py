@@ -34,11 +34,11 @@ def cluster_colors(pixels: np.ndarray, n: int) -> list[dict]:
     out = []
     for c, n_pix in zip(centers, counts):
         rgb = (int(c[0]), int(c[1]), int(c[2]))
-        h, s, l = rgb_to_hsl(rgb)
+        h, s, light = rgb_to_hsl(rgb)
         out.append({
             "rgb": list(rgb),
             "hex": rgb_to_hex(rgb),
-            "hsl": [h, s, l],
+            "hsl": [h, s, light],
             "pixel_count": int(n_pix),
             "pixel_share": round(float(n_pix / total), 4),
         })
@@ -72,8 +72,8 @@ def main() -> int:
     print("\nTop candidates by pixel share:")
     print(f"{'#':<3} {'hex':<8} {'family':<8} {'H':>5} {'S':>5} {'L':>5} {'share':>7}")
     for i, c in enumerate(cands[:12], 1):
-        h, s, l = c["hsl"]
-        print(f"{i:<3} {c['hex']:<8} {c['family']:<8} {h:>5.1f} {s:>5.1f} {l:>5.1f} {c['pixel_share']:>7.2%}")
+        h, s, light = c["hsl"]
+        print(f"{i:<3} {c['hex']:<8} {c['family']:<8} {h:>5.1f} {s:>5.1f} {light:>5.1f} {c['pixel_share']:>7.2%}")
     return 0
 
 

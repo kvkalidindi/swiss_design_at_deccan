@@ -116,13 +116,13 @@ def emit_md(p: dict) -> None:
         for step in ("100", "300", "500", "700"):
             e = p[fam][step]
             r, g, b = e["rgb"]
-            h, s, l = e["hsl"]
+            h, s, light = e["hsl"]
             c, m, y, k = e["cmyk"]
             pms = e["pantone"]["code"]
             de = e["pantone"]["delta_e"]
             de_note = "ok" if de < 2 else ("close" if de < 5 else "**verify**")
             out.append(
-                f"| `{fam}-{step}` | `{e['hex']}` | rgb({r}, {g}, {b}) | hsl({h}, {s}%, {l}%) | "
+                f"| `{fam}-{step}` | `{e['hex']}` | rgb({r}, {g}, {b}) | hsl({h}, {s}%, {light}%) | "
                 f"C{c} M{m} Y{y} K{k} | {pms} | {de} ({de_note}) | {USE_CASES[step]} |"
             )
         out.append("")

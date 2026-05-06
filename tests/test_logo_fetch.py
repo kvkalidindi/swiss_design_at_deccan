@@ -1,4 +1,3 @@
-from pathlib import Path
 from scripts import _01_fetch_logo as fetch_logo
 
 

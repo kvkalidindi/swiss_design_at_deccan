@@ -20,13 +20,13 @@ def rgb_to_hex(rgb: RGB) -> str:
 
 def rgb_to_hsl(rgb: RGB) -> HSL:
     r, g, b = (c / 255 for c in rgb)
-    h, l, s = colorsys.rgb_to_hls(r, g, b)
-    return (round(h * 360, 1), round(s * 100, 1), round(l * 100, 1))  # Return H, S, L
+    h, light, s = colorsys.rgb_to_hls(r, g, b)
+    return (round(h * 360, 1), round(s * 100, 1), round(light * 100, 1))  # Return H, S, L
 
 
 def hsl_to_rgb(hsl: HSL) -> RGB:
-    h, s, l = hsl[0] / 360, hsl[1] / 100, hsl[2] / 100
-    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    h, s, light = hsl[0] / 360, hsl[1] / 100, hsl[2] / 100
+    r, g, b = colorsys.hls_to_rgb(h, light, s)
     return (round(r * 255), round(g * 255), round(b * 255))
 
 

@@ -12,7 +12,7 @@ def main() -> int:
     size = sig.stat().st_size
     print(f"Wrote {sig} ({size:,} bytes)")
     if size > 10000:
-        print(f"  WARN: exceeds Gmail 10 KB signature limit")
+        print("  WARN: exceeds Gmail 10 KB signature limit")
         return 1
     return 0
 

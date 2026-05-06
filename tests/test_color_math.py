@@ -15,8 +15,8 @@ def test_rgb_to_hex_uppercase():
 
 def test_rgb_to_hsl_round_trip():
     rgb = (30, 91, 190)
-    h, s, l = cm.rgb_to_hsl(rgb)
-    rgb2 = cm.hsl_to_rgb((h, s, l))
+    h, s, light = cm.rgb_to_hsl(rgb)
+    rgb2 = cm.hsl_to_rgb((h, s, light))
     assert all(abs(a - b) <= 1 for a, b in zip(rgb, rgb2))
 
 def test_rgb_to_cmyk_pure_red():

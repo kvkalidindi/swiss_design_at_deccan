@@ -33,10 +33,10 @@ TINT_DESAT = 25.0
 
 
 def _adjust_hsl(rgb, dl=0.0, ds=0.0):
-    h, s, l = rgb_to_hsl(rgb)
+    h, s, light = rgb_to_hsl(rgb)
     s = max(0.0, min(100.0, s + ds))
-    l = max(0.0, min(100.0, l + dl))
-    return hsl_to_rgb((h, s, l))
+    light = max(0.0, min(100.0, light + dl))
+    return hsl_to_rgb((h, s, light))
 
 
 def _set_lightness(rgb, target_l, ds=0.0):
@@ -103,8 +103,8 @@ def main() -> int:
     for fam in ("blue", "green"):
         for step in ("100", "300", "500", "700"):
             e = p[fam][step]
-            h, s, l = e["hsl"]
-            print(f"  {fam}-{step}  {e['hex']}  H={h:>5.1f} S={s:>5.1f} L={l:>5.1f}")
+            h, s, light = e["hsl"]
+            print(f"  {fam}-{step}  {e['hex']}  H={h:>5.1f} S={s:>5.1f} L={light:>5.1f}")
     return 0
 
 

@@ -1,6 +1,4 @@
-import pytest
 from scripts import _03_generate_palette as gen
-from scripts.lib.color_math import rgb_to_hsl, hex_to_rgb
 
 
 def _real_anchors():
@@ -62,8 +60,8 @@ def test_100_is_very_light_tint():
     """blue-100 and green-100 should be tints (lightness ~88-95%)."""
     p = gen.build_palette(_real_anchors())
     for fam in ("blue", "green"):
-        l = p[fam]["100"]["hsl"][2]
-        assert 85 <= l <= 96, f"{fam}-100 lightness {l} outside 85-96 tint range"
+        light = p[fam]["100"]["hsl"][2]
+        assert 85 <= light <= 96, f"{fam}-100 lightness {light} outside 85-96 tint range"
 
 
 def test_blue_300_uses_logo_color_when_gap_sufficient():
