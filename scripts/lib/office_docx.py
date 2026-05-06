@@ -41,17 +41,12 @@ def _palette() -> dict:
 
 
 def _add_page_number_field(paragraph) -> None:
-    """Insert a 'Page X of Y' field into the given paragraph (right-aligned tab assumed)."""
-    run = paragraph.add_run("Page ")
-    run.font.name = "IBM Plex Sans"
-    run.font.size = Pt(9)
-
-    # PAGE field
+    """Insert a bare PAGE field (just the number) into the given paragraph."""
     fld_begin = OxmlElement("w:fldChar")
     fld_begin.set(qn("w:fldCharType"), "begin")
     instr = OxmlElement("w:instrText")
     instr.set(qn("xml:space"), "preserve")
-    instr.text = "PAGE"
+    instr.text = "PAGE   \\* MERGEFORMAT"
     fld_sep = OxmlElement("w:fldChar")
     fld_sep.set(qn("w:fldCharType"), "separate")
     fld_text = OxmlElement("w:t")
@@ -61,36 +56,35 @@ def _add_page_number_field(paragraph) -> None:
     page_run = paragraph.add_run()
     page_run.font.name = "IBM Plex Sans"
     page_run.font.size = Pt(9)
+    page_run.font.color.rgb = DocxRGB.from_string("595959")
     page_run._r.append(fld_begin)
     page_run._r.append(instr)
     page_run._r.append(fld_sep)
     page_run._r.append(fld_text)
     page_run._r.append(fld_end)
 
-    of_run = paragraph.add_run(" of ")
-    of_run.font.name = "IBM Plex Sans"
-    of_run.font.size = Pt(9)
 
-    # NUMPAGES field
-    fld_begin2 = OxmlElement("w:fldChar")
-    fld_begin2.set(qn("w:fldCharType"), "begin")
-    instr2 = OxmlElement("w:instrText")
-    instr2.set(qn("xml:space"), "preserve")
-    instr2.text = "NUMPAGES"
-    fld_sep2 = OxmlElement("w:fldChar")
-    fld_sep2.set(qn("w:fldCharType"), "separate")
-    fld_text2 = OxmlElement("w:t")
-    fld_text2.text = "1"
-    fld_end2 = OxmlElement("w:fldChar")
-    fld_end2.set(qn("w:fldCharType"), "end")
-    num_run = paragraph.add_run()
-    num_run.font.name = "IBM Plex Sans"
-    num_run.font.size = Pt(9)
-    num_run._r.append(fld_begin2)
-    num_run._r.append(instr2)
-    num_run._r.append(fld_sep2)
-    num_run._r.append(fld_text2)
-    num_run._r.append(fld_end2)
+def _enable_update_fields_on_open(doc) -> None:
+    """Add <w:updateFields w:val="true"/> to settings so PAGE renders on first open."""
+    settings = doc.settings.element
+    if settings.find(qn("w:updateFields")) is None:
+        upd = OxmlElement("w:updateFields")
+        upd.set(qn("w:val"), "true")
+        settings.append(upd)
+
+
+def _set_normal_style_full_width(doc) -> None:
+    """Ensure the Normal paragraph style fills the content area — no right indent,
+    no max width — so body text takes the full live width per the >=80% rule."""
+    if "Normal" not in doc.styles:
+        return
+    s = doc.styles["Normal"]
+    pf = s.paragraph_format
+    pf.left_indent = Inches(0)
+    pf.right_indent = Inches(0)
+    pf.first_line_indent = Inches(0)
+    s.font.name = "IBM Plex Sans"
+    s.font.size = Pt(11)
 
 
 def _set_paragraph_bottom_border(paragraph, color_hex: str) -> None:
@@ -312,6 +306,8 @@ def emit_dotx() -> Path:
     section.footer_distance = Inches(0.5)
     _set_section_different_first_page(section)
     _configure_heading_styles(doc, blue_500)
+    _set_normal_style_full_width(doc)
+    _enable_update_fields_on_open(doc)
 
     # First-page header/footer (suppressed: Word renders them blank because
     # different-first-page is on, but we still need empty placeholders).

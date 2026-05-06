@@ -19,10 +19,12 @@ These are non-negotiable and apply to every Word and PDF document produced from 
 
 1. **Cover page is mandatory and self-contained.** Body content does not begin until the cover page has been composed. No header, footer, or page number appears on it.
 2. **Cover page must include**, in this order: Deccan corporate logo, Document Title, optional Subtitle/subheading, Author / Prepared By, Version, Date. (Classification is also recommended.)
-3. **No section starts in the bottom 25% of the print area.** If a new content section (any heading H1/H2) would land in the bottom quarter of the page, force a page break so it begins at the top of the next page.
-4. **Content width ≥ 80% of the print area.** Margins must be tight enough that the live content area is at least 80% of paper width. For US Letter (8.5" wide) that means margins ≤ 0.85" on each side. The default is 0.8" giving 81.2% content width.
-5. **End page always follows a page break.** Body content ends, then a hard page break, then the end page. Never share a page with body content.
-6. **Footer shows page numbers on every body page.** Page numbers are suppressed only on the cover and the end page. Never anywhere in between.
+3. **Every new top-level section starts on a new page.** Each H1 carries `pageBreakBefore`; do not rely on the bottom-25% heuristic alone. The author must not override this on a per-paragraph basis.
+4. **Body text fills the full live content area in print.** The web `max-w-[60ch]` rule is for screen rendering only. In Word, PowerPoint, Excel, and exported PDFs, body paragraphs run edge-to-edge of the live content area (margin-to-margin). Do not introduce manual right indents or text frames that shrink the column.
+5. **Live content area ≥ 80% of paper width.** Margins must be tight enough that the live content area is at least 80% of paper width. For US Letter (8.5" wide) that means margins ≤ 0.85" on each side. The default is 0.8" giving 81.2% content width.
+6. **End page always follows a page break.** Body content ends, then a hard page break, then the end page. Never share a page with body content.
+7. **Footer shows the page number on every body page.** Page numbers are suppressed only on the cover and the end page. The page number is **the bare integer** (e.g. `12`), right-aligned in the footer — not "Page 12 of 47" or any other prefix/suffix.
+8. **Page background is white.** Body pages use pure white (`#FFFFFF`) as the page background. The Stone palette tints (`stone-50`, `stone-100`, `stone-200`) are **only** used for explicit callout / highlight / sidebar blocks that need contrast from surrounding content — never as a general page or surface background.
 
 ---
 
@@ -92,9 +94,9 @@ Every body page carries a footer with three regions:
 |--------|---------|
 | Left | "Deccan Chemicals · Confidential" — IBM Plex Sans 9pt, stone-900/70 |
 | Center | (blank) |
-| Right | "Page X of Y" — IBM Plex Sans 9pt, stone-900/70, tabular-nums |
+| Right | Page number, bare integer (e.g. `12`) — IBM Plex Sans 9pt, stone-900/70, tabular-nums |
 
-**Page numbers are mandatory on every body page.** They are suppressed only on the cover and end page.
+**Page numbers are mandatory on every body page** and rendered as the bare integer, right-aligned. Do not write "Page X" or "Page X of Y" — Word/PowerPoint/Excel and the resulting PDF all use the unadorned number. Page numbers are suppressed only on the cover and end page.
 
 A 0.5pt rule sits **above** the footer text in stone-200, matching the header.
 
@@ -110,11 +112,11 @@ Excel `oddFooter`: left = "Deccan Chemicals · Confidential", right = "Page &P o
 
 Body content must respect three flow rules so headings and sections never appear awkwardly placed:
 
-1. **No new section in the bottom 25%.** If a new H1 or H2 would start in the bottom quarter of the print area, force a page break first. Authors and templates implement this by setting `pageBreakBefore` on H1 styles and `keepWithNext` + `keepLinesTogether` on all heading styles, plus a generous `space_before` on H1.
-2. **Headings stay with their first body paragraph.** Set `keepWithNext=True` on every heading style.
-3. **Paragraphs do not split across pages mid-line.** Set `keepLinesTogether=True` on heading styles and on numbered lists.
+1. **Every H1 starts on a new page.** Top-level sections always begin at the top of a fresh page. Templates enforce this by setting `pageBreakBefore=True` on the Heading 1 style. Authors must not override it.
+2. **H2 / H3 headings stay with their first body paragraph.** `keepWithNext=True` on every heading style.
+3. **Paragraphs do not split across pages mid-line.** `keepLinesTogether=True` on heading styles and on numbered lists. As a fallback for H2/H3, the bottom-25% heuristic still applies: if a heading lands in the bottom quarter of a page, the author inserts an explicit page break.
 
-The 25% rule is enforced *visually* during review. Templates set the heading-style flags above so Word's layout engine pushes a heading to the next page when there is insufficient room. If after that a heading still lands in the bottom quarter, the author must insert an explicit page break.
+The point of the absolute "H1 → new page" rule is that document review is faster and more predictable when the reader knows section boundaries always coincide with page boundaries. The bottom-25% rule for sub-headings is a softer rule and lives in the author's hands.
 
 ---
 
@@ -130,6 +132,30 @@ Composition:
 4. **Tagline / contact line** — caption style 9pt, centered, stone-900/40, single line. Default: `deccanchemicals.com · Hyderabad, India`
 
 For Excel: a final worksheet named "End" containing the same composition (logo + brand line + tagline). Excel doesn't have a natural concept of an "end page", but a parallel sheet keeps the brand presence consistent when the workbook is paged through.
+
+---
+
+## Backgrounds and surfaces (print)
+
+Print documents use **pure white** (`#FFFFFF`) for all page backgrounds. This differs from screen rendering, where the Swiss web system uses `bg-stone-50` as a default page background.
+
+The Stone palette tints (`stone-50` `#FAFAF9`, `stone-100` `#F5F5F4`, `stone-200` `#E7E5E4`) are reserved in print for **explicit highlight or callout blocks** that must stand out from surrounding body content:
+
+- A boxed callout (`stone-100` fill with stone-200 border)
+- A pull-quote panel
+- A table's banded rows (allowed because the contrast is functional, not decorative)
+- A sidebar / "key takeaway" panel
+- A code block (`stone-100` fill, IBM Plex Mono inside)
+
+Stone tints are **never**:
+
+- A general page background
+- A wide horizontal band that spans the page just for visual texture
+- Applied to every body paragraph
+- Used in the running header or footer
+- Applied to multi-page sections to differentiate them — that's what the H1 page break is for
+
+If a callout block has no functional reason for its tint, drop the tint. White space is the design.
 
 ---
 

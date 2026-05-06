@@ -186,7 +186,7 @@ def _build_content_slide(prs, blue_500: str, title_text: str, slide_idx: int, to
         size=18, color_hex="1C1917", align=PP_ALIGN.LEFT,
     )
 
-    _add_slide_footer(slide, blue_500, "Section name", f"{slide_idx} / {total}")
+    _add_slide_footer(slide, blue_500, "Section name", str(slide_idx))
 
 
 def _build_end_slide(prs, blue_500: str) -> None:
