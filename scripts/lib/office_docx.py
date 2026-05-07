@@ -21,10 +21,15 @@ from docx import Document
 from docx.shared import Inches, Pt, RGBColor as DocxRGB
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT, WD_TAB_ALIGNMENT
 from docx.enum.section import WD_SECTION
+from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 from scripts.lib.office_theme import build_theme_xml
+
+# Stone-100 hex for code chip / block backgrounds (no leading #).
+STONE_100 = "F5F5F4"
+MONO_FONT = "IBM Plex Mono"
 
 ROOT = Path(__file__).resolve().parents[2]
 PALETTE = ROOT / "outputs" / "palette.json"
@@ -85,6 +90,61 @@ def _set_normal_style_full_width(doc) -> None:
     pf.first_line_indent = Inches(0)
     s.font.name = "IBM Plex Sans"
     s.font.size = Pt(11)
+
+
+def _add_shading(element, fill_hex: str) -> None:
+    """Append <w:shd w:val="clear" w:color="auto" w:fill="..."/> to a pPr or rPr."""
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:color"), "auto")
+    shd.set(qn("w:fill"), fill_hex)
+    element.append(shd)
+
+
+def _register_code_styles(doc) -> None:
+    """Register Code Inline (character) and Code Block (paragraph) styles with
+    IBM Plex Mono + stone-100 shading per skill/references/document-furniture.md."""
+    styles = doc.styles
+
+    # Code Inline — character style for runs of inline code/identifiers.
+    if "Code Inline" not in styles:
+        ci = styles.add_style("Code Inline", WD_STYLE_TYPE.CHARACTER)
+        ci.font.name = MONO_FONT
+        ci.font.size = Pt(10)
+        ci.font.color.rgb = DocxRGB.from_string("1C1917")
+        rPr = ci.element.get_or_add_rPr()
+        _add_shading(rPr, STONE_100)
+        # Force the East-Asian / complex-script font slot to the mono face too.
+        rFonts = rPr.find(qn("w:rFonts"))
+        if rFonts is None:
+            rFonts = OxmlElement("w:rFonts")
+            rPr.append(rFonts)
+        for attr in ("w:ascii", "w:hAnsi", "w:cs"):
+            rFonts.set(qn(attr), MONO_FONT)
+
+    # Code Block — paragraph style for multi-line code blocks.
+    if "Code Block" not in styles:
+        cb = styles.add_style("Code Block", WD_STYLE_TYPE.PARAGRAPH)
+        cb.font.name = MONO_FONT
+        cb.font.size = Pt(10)
+        cb.font.color.rgb = DocxRGB.from_string("1C1917")
+        pf = cb.paragraph_format
+        pf.left_indent = Inches(0)
+        pf.right_indent = Inches(0)
+        pf.first_line_indent = Inches(0)
+        pf.space_before = Pt(8)
+        pf.space_after = Pt(8)
+        pf.keep_together = True
+        rPr = cb.element.get_or_add_rPr()
+        rFonts = rPr.find(qn("w:rFonts"))
+        if rFonts is None:
+            rFonts = OxmlElement("w:rFonts")
+            rPr.append(rFonts)
+        for attr in ("w:ascii", "w:hAnsi", "w:cs"):
+            rFonts.set(qn(attr), MONO_FONT)
+        # Shade the paragraph (block fill).
+        pPr = cb.element.get_or_add_pPr()
+        _add_shading(pPr, STONE_100)
 
 
 def _set_paragraph_bottom_border(paragraph, color_hex: str) -> None:
@@ -307,6 +367,7 @@ def emit_dotx() -> Path:
     _set_section_different_first_page(section)
     _configure_heading_styles(doc, blue_500)
     _set_normal_style_full_width(doc)
+    _register_code_styles(doc)
     _enable_update_fields_on_open(doc)
 
     # First-page header/footer (suppressed: Word renders them blank because
@@ -336,14 +397,29 @@ def emit_dotx() -> Path:
     for run in h2.runs:
         run.font.name = "IBM Plex Sans"
 
-    p = doc.add_paragraph(
-        "Body paragraph using the Deccan typography stack. IBM Plex Sans at 11pt "
-        "with 1.5 line height. Use opacity (not different colors) for text "
-        "hierarchy per the Deccan design system."
-    )
+    p = doc.add_paragraph()
     for run in p.runs:
         run.font.name = "IBM Plex Sans"
         run.font.size = Pt(11)
+    p.add_run(
+        "Body paragraph using the Deccan typography stack. IBM Plex Sans at 11pt "
+        "with 1.5 line height. Use opacity (not different colors) for text "
+        "hierarchy per the Deccan design system. Reference inline code like "
+    )
+    chip = p.add_run("emit_dotx()")
+    chip.style = doc.styles["Code Inline"]
+    p.add_run(" or a file path like ")
+    chip2 = p.add_run("scripts/lib/office_docx.py")
+    chip2.style = doc.styles["Code Inline"]
+    p.add_run(" using the Code Inline character style.")
+    for run in p.runs:
+        if run.style is None or run.style.name == "Default Paragraph Font":
+            run.font.name = "IBM Plex Sans"
+            run.font.size = Pt(11)
+
+    # Code Block example
+    cb = doc.add_paragraph(style="Code Block")
+    cb.add_run("python -m scripts._09_emit_office\nWrote office/templates/deccan.dotx (49,972 bytes)")
 
     # Explicit page break out of body content before the end page.
     doc.add_page_break()

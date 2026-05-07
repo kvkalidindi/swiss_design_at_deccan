@@ -317,13 +317,13 @@ For Excel: a final worksheet named "End" containing the same composition (logo +
 
 Print documents use **pure white** (`#FFFFFF`) for all page backgrounds. This differs from screen rendering, where the Swiss web system uses `bg-stone-50` as a default page background.
 
-The Stone palette tints (`stone-50` `#FAFAF9`, `stone-100` `#F5F5F4`, `stone-200` `#E7E5E4`) are reserved in print for **explicit highlight or callout blocks** that must stand out from surrounding body content:
+The Stone palette tints (`stone-50` `#FAFAF9`, `stone-100` `#F5F5F4`, `stone-200` `#E7E5E4`) are reserved in print for **explicit highlight or callout blocks** that must stand out from surrounding body content. Permitted uses:
 
-- A boxed callout (`stone-100` fill with stone-200 border)
-- A pull-quote panel
+- **Code blocks** (the most common — see "Code and mono text" below)
+- **Inline code chips** (variable names, file paths, function names, command names — same below)
+- A boxed callout / pull-quote / "key takeaway" panel
 - A table's banded rows (allowed because the contrast is functional, not decorative)
-- A sidebar / "key takeaway" panel
-- A code block (`stone-100` fill, IBM Plex Mono inside)
+- A sidebar panel that intentionally interrupts body flow
 
 Stone tints are **never**:
 
@@ -334,6 +334,65 @@ Stone tints are **never**:
 - Applied to multi-page sections to differentiate them — that's what the H1 page break is for
 
 If a callout block has no functional reason for its tint, drop the tint. White space is the design.
+
+---
+
+## Code and mono text
+
+Any text rendered in the **monospace variant** of the type stack — IBM Plex Mono with the documented Fira Code → SFMono → Consolas fallback chain — must carry a Stone-tinted background. The mono treatment and the Stone background travel together. One never appears without the other.
+
+**Why:** The Swiss design system's body type is a sans grotesque (IBM Plex Sans) at the body width. When a mono glyph appears mid-paragraph or in a block, the eye needs an immediate visual cue that this is a different *kind* of content — code, identifier, file path, command — not just an italic or bold variation. Stone tinting + mono font is that cue.
+
+### Inline code (variable names, identifiers, file paths, technical tokens)
+
+| Property | Value |
+|----------|-------|
+| Font | IBM Plex Mono → Fira Code → SFMono → Consolas → ui-monospace |
+| Size | 0.95em of body (so ascender/descender match adjacent sans) |
+| Background | `stone-100` `#F5F5F4` |
+| Padding | 0.1em–0.2em horizontal in HTML; tight character shading in Word |
+| Color | Same as surrounding body text (do not recolor) |
+
+In Word, this is a **character style** named `Code Inline`. Authors apply it to runs of inline code; the style sets the font and adds character shading.
+
+### Code blocks (multi-line code, command snippets, configuration excerpts)
+
+| Property | Value |
+|----------|-------|
+| Font | IBM Plex Mono → Fira Code → SFMono → Consolas → ui-monospace |
+| Size | 10pt (or the equivalent in the host context) |
+| Background | `stone-100` `#F5F5F4` filling the whole block |
+| Border | None (the fill is enough — Swiss is rectilinear, not "boxed") |
+| Indent | Match body width — code blocks are full-width, not indented in from body |
+| Spacing | 8pt above, 8pt below (aligned to the 8px grid) |
+| Color | `stone-900` body text |
+| Page-break | Avoid splitting a block across pages when shorter than half a page |
+
+In Word, this is a **paragraph style** named `Code Block`. Authors apply it to entire paragraphs; the style sets the font, fill, and spacing.
+
+### What counts as "technical token"
+
+Apply the inline code chip to:
+
+- Variable names: `palette`, `blue_500`, `meta`
+- Function / method names: `emit_dotx()`, `build_palette()`
+- File paths: `scripts/lib/office_docx.py`, `~/.claude/settings.json`
+- Command names and shell snippets: `git push`, `python -m pytest`
+- Environment variables: `SEMGREP_APP_TOKEN`, `PATH`
+- Data-format keywords: `JSON`, `null`, `true` (when discussed *as* JSON tokens, not as English words)
+
+Do **not** apply it to:
+
+- Brand or product names (those use sans regular: "GitHub", "Word", "Claude")
+- Acronyms in body prose ("PDF", "API")
+- Numeric values quoted in body text ("the build is 49,972 bytes")
+
+### Format-specific implementation
+
+- **Word (.dotx)**: ships with `Code Inline` (character style) and `Code Block` (paragraph style) registered in the styles part. Pre-styled.
+- **PowerPoint (.potx)**: a slide-master text layout placeholder labelled "Code" uses the same mono+stone treatment. Authors paste code into that placeholder, not into normal body text frames.
+- **Excel (.xltx)**: a named cell style "Code" applies IBM Plex Mono + stone-100 fill. Use it on cells that contain command snippets, formulas, or technical IDs.
+- **PDF**: inherits from the Word/PowerPoint/Excel source.
 
 ---
 

@@ -27,6 +27,20 @@ LOGO = ROOT / "data" / "logo.png"
 OUT = ROOT / "office" / "templates" / "deccan.xltx"
 
 
+def _fit_to_one_page(ws) -> None:
+    """Force a sheet to print on a single page so cover/end/data don't spill
+    onto blank trailing pages with stray accent rules or truncated text."""
+    ws.page_setup.fitToPage = True
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 1
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
+    ws.page_margins.left = 0.4
+    ws.page_margins.right = 0.4
+    ws.page_margins.top = 0.5
+    ws.page_margins.bottom = 0.5
+
+
 def _set_print_header_footer(ws, title_text: str, classification: str = "Confidential") -> None:
     """Configure Excel print header/footer with logo + title and classification + page #."""
     # Header: left = logo (&G), right = title in 9pt IBM Plex Sans
@@ -109,6 +123,11 @@ def _build_cover_sheet(wb, blue_500: str) -> None:
     for letter in "CDEFGH":
         ws.column_dimensions[letter].width = 18
 
+    # Set the cover's print area to the live composition only — empty rows
+    # below the metadata block must not paginate onto a blank "page 2".
+    ws.print_area = "A1:H20"
+    _fit_to_one_page(ws)
+
 
 def _build_data_sheet(wb, blue_500: str, blue_700: str, stone_50: str) -> None:
     ws = wb.create_sheet("Sheet1")
@@ -141,6 +160,8 @@ def _build_data_sheet(wb, blue_500: str, blue_700: str, stone_50: str) -> None:
         ws.column_dimensions[col_letter].width = width
 
     _set_print_header_footer(ws, "Document Title")
+    ws.print_area = "A1:F30"
+    _fit_to_one_page(ws)
 
 
 def _build_end_sheet(wb) -> None:
@@ -170,6 +191,9 @@ def _build_end_sheet(wb) -> None:
 
     for letter in "ABCDEFGH":
         ws.column_dimensions[letter].width = 14
+
+    ws.print_area = "A1:H20"
+    _fit_to_one_page(ws)
 
 
 def emit_xltx() -> Path:
