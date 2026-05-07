@@ -1,4 +1,4 @@
-# Deccan Chemicals - Accent Color Palette
+# Deccan Fine Chemicals - Accent Color Palette
 
 Generated from the corporate logo at https://deccanchemicals.com.
 Anchor steps (`-500`) are exact colors taken from the logo. Other steps

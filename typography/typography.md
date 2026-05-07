@@ -1,6 +1,6 @@
-# Deccan Chemicals — Typography
+# Deccan Fine Chemicals — Typography
 
-The Deccan Chemicals design system inherits its typography from
+The Deccan Fine Chemicals design system inherits its typography from
 [zeke/swiss-design-skill](https://github.com/zeke/swiss-design-skill), whose
 font stack is 100% license-compliant (SIL Open Font License 1.1). **No
 substitutions were required.** The audit at `typography/audit-notes.md`

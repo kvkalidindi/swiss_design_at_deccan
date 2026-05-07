@@ -1,6 +1,6 @@
 ---
 name: swiss-design-deccan
-description: Apply the Deccan Chemicals design system (Swiss International Style adapted for Deccan brand). Use when styling Deccan webpages, cleaning up Deccan UIs, or applying the corporate design system. Single accent #164999 (deep navy), IBM Plex Sans typography, opacity-based hierarchy, structured grid. Secondary green mark #71BF4D is reserved for the corporate logo and explicit sustainability content only.
+description: Apply the Deccan Fine Chemicals design system (Swiss International Style adapted for Deccan brand). Use when styling Deccan webpages, cleaning up Deccan UIs, or applying the corporate design system. Single accent #164999 (deep navy), IBM Plex Sans typography, opacity-based hierarchy, structured grid. Secondary green mark #71BF4D is reserved for the corporate logo and explicit sustainability content only.
 license: MIT
 metadata:
   author: kvkalidindi

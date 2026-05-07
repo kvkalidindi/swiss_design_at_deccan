@@ -33,7 +33,7 @@ def color_map(palette: dict) -> dict[str, str]:
 
 
 THEME_XML_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Deccan Chemicals">
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Deccan Fine Chemicals">
   <a:themeElements>
     <a:clrScheme name="Deccan">
       <a:dk1><a:srgbClr val="{text1}"/></a:dk1>

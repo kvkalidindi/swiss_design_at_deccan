@@ -1,6 +1,6 @@
 # Swiss Design at Deccan
 
-A multi-format design system for Deccan Chemicals, built on the foundation of [zeke/swiss-design-skill](https://github.com/zeke/swiss-design-skill). It extends Swiss design principles beyond web UI to cover Microsoft 365, Google Workspace, print, and brand collateral, with a brand-derived 8-step accent color palette extracted from the corporate logo.
+A multi-format design system for Deccan Fine Chemicals, built on the foundation of [zeke/swiss-design-skill](https://github.com/zeke/swiss-design-skill). It extends Swiss design principles beyond web UI to cover Microsoft 365, Google Workspace, print, and brand collateral, with a brand-derived 8-step accent color palette extracted from the corporate logo.
 
 ## Status
 

@@ -5,7 +5,7 @@ def test_locate_logo_url_picks_header_img():
     html = '''
     <html><head><title>X</title></head>
     <body>
-      <header><img src="/wp-content/uploads/logo.png" alt="Deccan Chemicals"></header>
+      <header><img src="/wp-content/uploads/logo.png" alt="Deccan Fine Chemicals"></header>
     </body></html>
     '''
     url = fetch_logo.find_logo_url(html, base_url="https://deccanchemicals.com")
@@ -15,7 +15,7 @@ def test_locate_logo_url_picks_header_img():
 def test_locate_logo_url_falls_back_to_alt_text():
     html = '''
     <html><body>
-      <div><img src="https://cdn.example.com/site/dc-logo.png" alt="Deccan Chemicals Logo"></div>
+      <div><img src="https://cdn.example.com/site/dc-logo.png" alt="Deccan Fine Chemicals Logo"></div>
     </body></html>
     '''
     url = fetch_logo.find_logo_url(html, base_url="https://deccanchemicals.com")

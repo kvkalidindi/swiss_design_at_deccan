@@ -9,7 +9,7 @@
 
 ## 1. Background & Goal
 
-Plan 1 produced the brand-derived 8-step accent palette, typography stack, and supporting deliverables (palette.json/css/ase/html/md, fonts/, typography.md). Plan 2 takes the upstream [zeke/swiss-design-skill](https://github.com/zeke/swiss-design-skill) — a Claude Code skill encoding Swiss International Style design principles — and customizes it for Deccan Chemicals so that engineers, designers, and AI agents producing Deccan-branded UIs follow the same system.
+Plan 1 produced the brand-derived 8-step accent palette, typography stack, and supporting deliverables (palette.json/css/ase/html/md, fonts/, typography.md). Plan 2 takes the upstream [zeke/swiss-design-skill](https://github.com/zeke/swiss-design-skill) — a Claude Code skill encoding Swiss International Style design principles — and customizes it for Deccan Fine Chemicals so that engineers, designers, and AI agents producing Deccan-branded UIs follow the same system.
 
 The deliverable is a self-contained Claude Code skill at `swiss_design_at_deccan/skill/` that any user can install (copy to `~/.claude/skills/` or reference via plugin manifest) and have AI agents produce Deccan-branded UIs by default.
 

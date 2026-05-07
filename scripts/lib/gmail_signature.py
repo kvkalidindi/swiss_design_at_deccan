@@ -45,7 +45,7 @@ def emit_gmail_signature() -> Path:
 <table cellpadding="0" cellspacing="0" border="0" style="font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; color:{text_color}; font-size: 13px; line-height: 1.45;">
   <tr>
     <td style="padding-bottom:6px;">
-      <img src="{logo_src}" alt="Deccan Chemicals" width="{LOGO_WIDTH}" height="{LOGO_HEIGHT}" style="display:block;border:0;outline:none;text-decoration:none">
+      <img src="{logo_src}" alt="Deccan Fine Chemicals" width="{LOGO_WIDTH}" height="{LOGO_HEIGHT}" style="display:block;border:0;outline:none;text-decoration:none">
     </td>
   </tr>
   <tr>

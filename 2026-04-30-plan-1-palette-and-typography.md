@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Produce the brand-derived 8-step accent palette (4 blue + 4 green) and Google Fonts substitution package for Deccan Chemicals' design system, in all required formats (web, print, design tools, documentation).
+**Goal:** Produce the brand-derived 8-step accent palette (4 blue + 4 green) and Google Fonts substitution package for Deccan Fine Chemicals' design system, in all required formats (web, print, design tools, documentation).
 
 **Architecture:** Python pipeline (Pillow + scikit-learn + colormath) extracts logo colors → curated anchors generate HSL-progression steps → conversions emit hex/RGB/HSL/CMYK/Pantone-approx → multi-format outputs (JSON, CSS, ASE, HTML, MD). Typography audit clones swiss-design-skill, inventories fonts, picks Google Fonts substitutes by metric similarity, packages OFL-compliant font files.
 
@@ -172,7 +172,7 @@ def test_locate_logo_url_picks_header_img(tmp_path):
     html = '''
     <html><head><title>X</title></head>
     <body>
-      <header><img src="/wp-content/uploads/logo.png" alt="Deccan Chemicals"></header>
+      <header><img src="/wp-content/uploads/logo.png" alt="Deccan Fine Chemicals"></header>
     </body></html>
     '''
     url = fetch_logo.find_logo_url(html, base_url="https://deccanchemicals.com")
@@ -1117,7 +1117,7 @@ def emit_ase(p: dict) -> None:
         for step in ("100", "300", "500", "700"):
             e = p[fam][step]
             swatches.append((f"{fam}-{step}", tuple(e["rgb"])))
-    write_ase(OUT / "palette.ase", "Deccan Chemicals — Accent", swatches)
+    write_ase(OUT / "palette.ase", "Deccan Fine Chemicals — Accent", swatches)
 ```
 
 And call it in `main()`:
@@ -1185,7 +1185,7 @@ def emit_html(p: dict) -> None:
         rows.append(f'<section><h2>{fam.title()}</h2><div class="row">{"".join(cells)}</div></section>')
     html = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<title>Deccan Chemicals — Accent Palette</title>
+<title>Deccan Fine Chemicals — Accent Palette</title>
 <style>
   body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 32px; }}
   h1 {{ font-weight: 400; letter-spacing: -.02em; }}
@@ -1197,7 +1197,7 @@ def emit_html(p: dict) -> None:
   .pms  {{ font-size: 11px; opacity: .8; margin-top: 18px; }}
 </style></head>
 <body>
-  <h1>Deccan Chemicals — Accent Palette</h1>
+  <h1>Deccan Fine Chemicals — Accent Palette</h1>
   {"".join(rows)}
   <p style="opacity:.6;font-size:12px">Generated from corporate logo at deccanchemicals.com</p>
 </body></html>"""
@@ -1247,7 +1247,7 @@ def emit_md(p: dict) -> None:
         "500": "**Anchor** — primary buttons, links, brand identity, default chart series color.",
         "700": "Hover/pressed states; text on light backgrounds; emphasis; chart series 2.",
     }
-    out = ["# Deccan Chemicals — Accent Color Palette",
+    out = ["# Deccan Fine Chemicals — Accent Color Palette",
            "",
            "Generated from the corporate logo at https://deccanchemicals.com.",
            "Anchor steps (`-500`) are exact colors taken from the logo. Other steps",
@@ -1518,9 +1518,9 @@ git commit -m "feat(typography): package OFL Google Fonts substitutes"
 Create `typography/typography.md` populated from the substitution map:
 
 ```markdown
-# Deccan Chemicals — Typography
+# Deccan Fine Chemicals — Typography
 
-The Deccan Chemicals design system uses free Google Fonts substitutes for any
+The Deccan Fine Chemicals design system uses free Google Fonts substitutes for any
 commercially-licensed fonts referenced in the upstream `zeke/swiss-design-skill`
 specification. All chosen fonts are licensed under SIL Open Font License 1.1,
 which permits redistribution and embedding in corporate documents.

@@ -4,7 +4,7 @@
                            revision="1.0" schemaVersion="1.0"
                            xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
   <displayName>Deccan Design System Policies</displayName>
-  <description>Group Policy templates for deploying the Deccan Chemicals design system.</description>
+  <description>Group Policy templates for deploying the Deccan Fine Chemicals design system.</description>
   <resources>
     <stringTable>
       <string id="Cat_DeccanDesignSystem">Deccan Design System</string>

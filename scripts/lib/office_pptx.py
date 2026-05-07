@@ -204,7 +204,7 @@ def _build_end_slide(prs, blue_500: str) -> None:
         )
 
     _add_text(
-        slide, "Deccan Chemicals",
+        slide, "Deccan Fine Chemicals",
         Inches(0), Inches(4.6),
         SLIDE_W, Inches(0.5),
         size=20, color_hex="1C1917", align=PP_ALIGN.CENTER,

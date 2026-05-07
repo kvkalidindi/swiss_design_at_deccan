@@ -199,7 +199,7 @@ def _build_running_header(section, title_text: str) -> None:
 def _build_running_footer(section, classification: str = "Confidential") -> None:
     """Write the running footer into `section.footer`.
 
-    Layout: [Deccan Chemicals · classification] .... [Page X of Y], thin top rule.
+    Layout: [Deccan Fine Chemicals · classification] .... [Page X of Y], thin top rule.
     """
     footer = section.footer
     footer.is_linked_to_previous = False
@@ -209,7 +209,7 @@ def _build_running_footer(section, classification: str = "Confidential") -> None
         section.page_width - section.left_margin - section.right_margin,
         WD_TAB_ALIGNMENT.RIGHT,
     )
-    left = p.add_run(f"Deccan Chemicals · {classification}")
+    left = p.add_run(f"Deccan Fine Chemicals · {classification}")
     left.font.name = "IBM Plex Sans"
     left.font.size = Pt(9)
     left.font.color.rgb = DocxRGB.from_string("595959")
@@ -295,7 +295,7 @@ def _build_end_page(doc, blue_500: str) -> None:
 
     brand_p = doc.add_paragraph()
     brand_p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-    brand_run = brand_p.add_run("Deccan Chemicals")
+    brand_run = brand_p.add_run("Deccan Fine Chemicals")
     brand_run.font.name = "IBM Plex Sans"
     brand_run.font.size = Pt(14)
     brand_run.font.color.rgb = DocxRGB.from_string("1C1917")

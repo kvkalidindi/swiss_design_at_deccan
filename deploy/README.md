@@ -1,6 +1,6 @@
 # Deccan Design System — Deployment Bundle
 
-This directory contains everything needed to install the Deccan Chemicals design system on a Windows PC: IBM Plex fonts, Office theme + 3 templates, and the registry settings that make Office discover them.
+This directory contains everything needed to install the Deccan Fine Chemicals design system on a Windows PC: IBM Plex fonts, Office theme + 3 templates, and the registry settings that make Office discover them.
 
 ## Quick start (default: system-wide fonts)
 

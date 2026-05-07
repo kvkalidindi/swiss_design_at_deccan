@@ -217,7 +217,7 @@ def color_map(palette: dict) -> dict[str, str]:
 
 
 THEME_XML_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Deccan Chemicals">
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Deccan Fine Chemicals">
   <a:themeElements>
     <a:clrScheme name="Deccan">
       <a:dk1><a:srgbClr val="{text1}"/></a:dk1>
@@ -640,7 +640,7 @@ def emit_dotx() -> Path:
     footer = doc.sections[0].footer
     footer_p = footer.paragraphs[0]
     footer_p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-    footer_run = footer_p.add_run("Deccan Chemicals - Confidential")
+    footer_run = footer_p.add_run("Deccan Fine Chemicals - Confidential")
     footer_run.font.name = "IBM Plex Sans"
     footer_run.font.size = Pt(9)
 
@@ -899,7 +899,7 @@ def emit_signature() -> Path:
 <table cellpadding="0" cellspacing="0" border="0" style="font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; color:{text_color}; font-size: 13px; line-height: 1.45;">
   <tr>
     <td style="padding-bottom:8px;">
-      <img src="{logo_src}" alt="Deccan Chemicals" width="160" style="display:block;border:0;outline:none;text-decoration:none">
+      <img src="{logo_src}" alt="Deccan Fine Chemicals" width="160" style="display:block;border:0;outline:none;text-decoration:none">
     </td>
   </tr>
   <tr>

@@ -284,7 +284,7 @@ Every body page carries a footer with three regions:
 
 | Region | Content |
 |--------|---------|
-| Left | "Deccan Chemicals · Confidential" — IBM Plex Sans 9pt, stone-900/70 |
+| Left | "Deccan Fine Chemicals · Confidential" — IBM Plex Sans 9pt, stone-900/70 |
 | Center | (blank) |
 | Right | Page number, bare integer (e.g. `12`) — IBM Plex Sans 9pt, stone-900/70, tabular-nums |
 
@@ -296,7 +296,7 @@ Confidentiality classification can be one of: `Public`, `Internal`, `Confidentia
 
 PowerPoint slide footer (left to right): logo (0.9" wide) — section name — slide number. The slide footer rule is a 1pt blue-500 line at 30% opacity along the slide bottom, 0.4" from the edge.
 
-Excel `oddFooter`: left = "Deccan Chemicals · Confidential", right = "Page &P of &N".
+Excel `oddFooter`: left = "Deccan Fine Chemicals · Confidential", right = "Page &P of &N".
 
 ---
 
@@ -320,7 +320,7 @@ Composition:
 
 1. **Vertical centering** — the content is anchored to the visual centre of the page, with substantial whitespace above and below
 2. **Logo** — centered, 1.8" / 46mm width
-3. **Brand line** — "Deccan Chemicals" in IBM Plex Sans Regular 14pt, centered, full-opacity stone-900
+3. **Brand line** — "Deccan Fine Chemicals" in IBM Plex Sans Regular 14pt, centered, full-opacity stone-900
 4. **Tagline / contact line** — caption style 9pt, centered, stone-900/40, single line. Default: `deccanchemicals.com · Hyderabad, India`
 
 For Excel: a final worksheet named "End" containing the same composition (logo + brand line + tagline). Excel doesn't have a natural concept of an "end page", but a parallel sheet keeps the brand presence consistent when the workbook is paged through.
@@ -410,6 +410,46 @@ Do **not** apply it to:
 
 ---
 
+## Tone and voice
+
+Documents generated under this system are issued by Deccan Fine Chemicals as corporate communications — internal standards, technical guides, policy briefs, audit-grade specifications. They are read by engineers, auditors, customers, and regulators. The prose must match that audience.
+
+### Required register
+
+- **Direct, declarative, third-person.** State the position, then the rationale. "The Deccan standard is CPython 3.12." Not "Let's talk about why we're picking 3.12."
+- **Section headings name the subject.** "Choosing a Python version" or "Python version selection" — not "Choosing a Python version: the EOL clock is the deciding factor" or "Why this guide exists, in a teacher's voice." The reader should be able to scan a table of contents and know exactly what each section covers without parsing a clause.
+- **Specific over generic.** Cite the version, the date, the file path, the policy clause. Avoid vague hedging ("generally", "typically", "in most cases") unless the hedge is load-bearing.
+- **Active voice for actions, passive only when the actor is irrelevant.** "Engineers install CPython 3.12" — active. "Workstations are scanned weekly" — passive is fine because the actor (Tenable, Defender) is a routine corporate process.
+
+### Tropes to avoid
+
+The following patterns are common in LLM-authored prose and are **not** acceptable in Deccan corporate documents:
+
+| Trope | Why it's wrong | Replacement |
+|-------|----------------|-------------|
+| Conversational subtitles in headings: `: in a teacher's voice`, `: in plain English`, `: the EOL clock is the deciding factor` | Mixes editorial tone with the corporate document. Pads the heading. | Plain noun-phrase headings: `Python version selection`, `Document furniture`. |
+| First-person narrator asides: "Let me walk you through…", "I want to show you…", "I'll go slowly here" | Casts the document as a personal essay. Deccan documents speak for the company, not the author. | Drop them. State the content directly. |
+| Filler openings: "Here's the thing:", "It's worth noting that…", "It's important to note…", "Let's start by…" | Pure padding. The reader knows it's worth noting; that's why it's in the document. | Drop. Start with the substantive sentence. |
+| Casual transitions: "That said,", "With that out of the way,", "Now, let's…" | Conversational register. | Use a section break or a topic-sentence transition. |
+| Decorative emoji in body content: ✅ ❌ ✓ ✗ ⚡ 💡 🔧 🚀 | Not corporate-document register. Renders inconsistently across PDF/print. | Use words: "Required", "Prohibited", "Note". For lists use proper bullets or numbered items. |
+| Exclamation marks in body prose | Reads as marketing copy. | Drop. Use a period. |
+| "Deep dive", "let's dive in", "rabbit hole", "TL;DR" | Blog-post register. | Plain language: "detailed analysis", "in summary", "summary". |
+| Mental-exercise framings: "A useful way to think about this is…", "Imagine if…", "Think of X as Y" | Often padding around an idea that should be stated directly. | State the idea. If a comparison is genuinely needed, label it: "Analogy:". |
+| Self-reference to the document: "This guide will teach you…", "By the end of this section you'll know…" | Treats the reader as a student. They are colleagues and stakeholders. | Drop. The document's existence implies its purpose. |
+| Italicized aside-clauses for emphasis (`*the shape* of the problem`) | Casual editorial tone. | Use noun phrases or a defined-term convention if a term is technical. |
+| Em-dash narrator interjections: "— and here's the kicker —" | Newsroom/blog register. | Drop. State the consequence directly. |
+
+### Voice for code-adjacent content
+
+Technical content (commands, configuration, identifiers) follows the mono+stone rule above. Surrounding prose stays in the corporate register:
+
+- ✅ "Workstations install CPython 3.12 from the python.org installer. The patch release pinned at provisioning time is the latest available; downgrades require a documented exception."
+- ❌ "Hey, so basically, you'll want to grab Python 3.12 from python.org — the patch release should be the newest one, no need to stay behind!"
+
+When in doubt, read the sentence aloud. If it would feel out of place in a board paper, an audit response, or a regulator submission, rewrite it.
+
+---
+
 ## Page setup
 
 | Paper | Margins | Content width | % of paper |
@@ -464,7 +504,7 @@ To visually verify a generated `.dotx` / `.potx` / `.xltx`, render it to PDF and
 
 - Cover page is page 1 with no header/footer/page number.
 - Body content begins on page 2.
-- Header (logo + title) and footer ("Deccan Chemicals · Confidential" + "Page X of Y") appear on every body page.
+- Header (logo + title) and footer ("Deccan Fine Chemicals · Confidential" + "Page X of Y") appear on every body page.
 - No heading lands in the bottom 25% of any page.
 - End page is the final page, alone, with no header/footer/page number.
 - Live content area is at least 80% of paper width.
@@ -603,7 +643,7 @@ Claude.ai conversations don't always have the same skill-bundle file access as C
 
 ```html
 <img src="data:image/png;base64,{b64_preview}"
-     alt="Deccan Chemicals" width="185" height="60">
+     alt="Deccan Fine Chemicals" width="185" height="60">
 ```
 
 The full base64 payload is in `skill/assets/logo.b64.txt` (it is too large to inline in this reference). Read that file and substitute the body of the data URI. The result is a self-contained artifact with **zero** network dependencies.
@@ -652,11 +692,11 @@ When generating a Word-equivalent or PDF document under the swiss_design_at_decc
 
 - `@font-face` rules for IBM Plex Sans (variable, weights 100-700) and IBM Plex Mono (Regular + Bold)
 - Brand colour tokens (`--accent: #164999`, stone palette, ink opacity tokens)
-- `@page` rules implementing the running header (logo + doc title + thin rule), the running footer (`Deccan Chemicals · {{{{CLASSIFICATION}}}}` + bare-integer page number), and suppressed furniture on cover/end pages
+- `@page` rules implementing the running header (logo + doc title + thin rule), the running footer (`Deccan Fine Chemicals · {{{{CLASSIFICATION}}}}` + bare-integer page number), and suppressed furniture on cover/end pages
 - A cover composition matching the spec exactly: 2.5″ logo top-left, 36pt light Deccan Blue title, 16pt subtitle, full-width accent rule, 5-row metadata block (DOCUMENT TYPE / PREPARED BY / DATE / VERSION / CLASSIFICATION)
 - Heading rules: `h1` is 28pt, font-weight 300, Deccan Blue, with `page-break-before: always` so every section starts on a new page
 - Code styling: inline `<code>` and `.code-inline` get IBM Plex Mono + stone-100 chip; `<pre>` and `.code-block` get full-width stone-100 panels
-- An end page composition matching the spec: centered logo, "Deccan Chemicals" brand line, contact line at low opacity
+- An end page composition matching the spec: centered logo, "Deccan Fine Chemicals" brand line, contact line at low opacity
 
 ## Slot placeholders
 

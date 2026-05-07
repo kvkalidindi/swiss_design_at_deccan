@@ -65,7 +65,7 @@ Theme fonts:
 - Cover page: title, subtitle, date, author placeholder + logo (top-left)
 - Executive summary block
 - Body styles: H1–H4 (IBM Plex Sans, accent1), Body, Caption, Quote, Code (IBM Plex Mono)
-- Page header (logo) + footer (page numbers + "Deccan Chemicals — Confidential" placeholder)
+- Page header (logo) + footer (page numbers + "Deccan Fine Chemicals — Confidential" placeholder)
 - Auto-generated table-of-contents style
 - Appendix section style
 

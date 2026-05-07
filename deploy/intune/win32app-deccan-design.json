@@ -1,9 +1,9 @@
 {
   "$schema": "https://schema.example.com/intune-win32-app/v1",
   "_comment": "Example metadata for Intune Win32 app deployment of the Deccan design system. Adapt and import into Intune via Microsoft Endpoint Manager admin center; this JSON is not consumed directly by Intune APIs.",
-  "displayName": "Deccan Chemicals Design System",
+  "displayName": "Deccan Fine Chemicals Design System",
   "description": "IBM Plex Sans/Mono fonts, Deccan-branded Office theme, and Word/PowerPoint/Excel templates. Per-user install. Configures HKCU registry so Office discovers the templates in File > New > Personal.",
-  "publisher": "Deccan Chemicals",
+  "publisher": "Deccan Fine Chemicals",
   "version": "0.5.0",
   "installCommandLine": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\\install.ps1",
   "uninstallCommandLine": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\\install.ps1 -Uninstall",

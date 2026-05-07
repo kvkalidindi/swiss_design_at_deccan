@@ -29,7 +29,7 @@ Claude.ai conversations don't always have the same skill-bundle file access as C
 
 ```html
 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALkAAAA8CAYAAAA60Bs3AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAA…"
-     alt="Deccan Chemicals" width="185" height="60">
+     alt="Deccan Fine Chemicals" width="185" height="60">
 ```
 
 The full base64 payload is in `skill/assets/logo.b64.txt` (it is too large to inline in this reference). Read that file and substitute the body of the data URI. The result is a self-contained artifact with **zero** network dependencies.

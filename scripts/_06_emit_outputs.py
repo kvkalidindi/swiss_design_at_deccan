@@ -51,7 +51,7 @@ def emit_ase(p: dict) -> None:
         for step in ("100", "300", "500", "700"):
             e = p[fam][step]
             swatches.append((f"{fam}-{step}", tuple(e["rgb"])))
-    write_ase(OUT / "palette.ase", "Deccan Chemicals - Accent", swatches)
+    write_ase(OUT / "palette.ase", "Deccan Fine Chemicals - Accent", swatches)
 
 
 def emit_html(p: dict) -> None:
@@ -75,7 +75,7 @@ def emit_html(p: dict) -> None:
     html = (
         "<!doctype html>\n"
         "<html lang=\"en\"><head><meta charset=\"utf-8\">\n"
-        "<title>Deccan Chemicals - Accent Palette</title>\n"
+        "<title>Deccan Fine Chemicals - Accent Palette</title>\n"
         "<style>\n"
         "  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 32px; color: #222; }\n"
         "  h1 { font-weight: 400; letter-spacing: -.02em; }\n"
@@ -89,7 +89,7 @@ def emit_html(p: dict) -> None:
         "  .de   { opacity: .7; }\n"
         "</style></head>\n"
         "<body>\n"
-        "  <h1>Deccan Chemicals - Accent Palette</h1>\n"
+        "  <h1>Deccan Fine Chemicals - Accent Palette</h1>\n"
         f"  {''.join(sections)}\n"
         "  <p style=\"opacity:.6;font-size:12px\">Generated from corporate logo at deccanchemicals.com.</p>\n"
         "</body></html>\n"
@@ -99,7 +99,7 @@ def emit_html(p: dict) -> None:
 
 def emit_md(p: dict) -> None:
     out: list[str] = [
-        "# Deccan Chemicals - Accent Color Palette",
+        "# Deccan Fine Chemicals - Accent Color Palette",
         "",
         "Generated from the corporate logo at https://deccanchemicals.com.",
         "Anchor steps (`-500`) are exact colors taken from the logo. Other steps",

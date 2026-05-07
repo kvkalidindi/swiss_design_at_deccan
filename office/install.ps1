@@ -1,7 +1,7 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-    Per-user installer for the Deccan Chemicals Office artifacts.
+    Per-user installer for the Deccan Fine Chemicals Office artifacts.
 
 .DESCRIPTION
     Copies office-theme.thmx and the Word/PowerPoint/Excel templates into the

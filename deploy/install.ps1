@@ -1,7 +1,7 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-    Install the full Deccan Chemicals design system on this PC.
+    Install the full Deccan Fine Chemicals design system on this PC.
 
 .DESCRIPTION
     Installs IBM Plex fonts, the Office theme + 3 templates, and the HKCU

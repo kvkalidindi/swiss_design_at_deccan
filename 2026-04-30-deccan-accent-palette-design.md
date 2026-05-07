@@ -1,4 +1,4 @@
-# Deccan Chemicals Design System — Accent Color Palette & Multi-Format Foundation
+# Deccan Fine Chemicals Design System — Accent Color Palette & Multi-Format Foundation
 
 **Date:** 2026-04-30
 **Owner:** kishore.kalidindi@deccanchemicals.com
@@ -8,22 +8,22 @@
 
 ## 1. Background & Goal
 
-Deccan Chemicals is rebuilding its corporate website from scratch and adopting a comprehensive design system that will govern all company collateral—web, documents, print, and brand materials.
+Deccan Fine Chemicals is rebuilding its corporate website from scratch and adopting a comprehensive design system that will govern all company collateral—web, documents, print, and brand materials.
 
 The chosen foundation is **swiss-design-skill** (zeke/swiss-design-skill on GitHub), a Swiss-design-principles design skill currently focused on web UI with Tailwind CSS. We will:
 
-1. **Replace** its accent color palette with a brand-derived 8-step accent palette extracted from the Deccan Chemicals corporate logo.
+1. **Replace** its accent color palette with a brand-derived 8-step accent palette extracted from the Deccan Fine Chemicals corporate logo.
 2. **Extend** the design system beyond web UI to support Microsoft 365, Google Workspace, and print/brand collateral.
 3. **Substitute** any commercially-licensed fonts in the original skill with the closest free Google Fonts equivalents.
 4. **Deploy** the final system to all corporate Windows 11 PCs so that Office, browsers, and design tools default to brand-compliant settings.
 
-The deliverable is a modified swiss-design-skill that becomes the official Deccan Chemicals design guideline.
+The deliverable is a modified swiss-design-skill that becomes the official Deccan Fine Chemicals design guideline.
 
 ---
 
 ## 2. Color Extraction Methodology
 
-**Source:** Deccan Chemicals corporate logo, retrieved from https://deccanchemicals.com
+**Source:** Deccan Fine Chemicals corporate logo, retrieved from https://deccanchemicals.com
 
 **Process:**
 1. Fetch the live website and locate the logo asset (PNG or SVG in the header).
@@ -195,7 +195,7 @@ Goal: Word, PowerPoint, browsers, and Google Workspace default to the new design
 - Exact hex values of the 6 logo colors (depends on the actual logo asset)
 - Final font list from swiss-design-skill (depends on the repo audit)
 - Whether the Pantone values can be derived algorithmically or require professional reference (Pantone bridge guides may be needed for exact matches)
-- Intune vs Group Policy availability in the Deccan Chemicals IT environment
+- Intune vs Group Policy availability in the Deccan Fine Chemicals IT environment
 - Existing Microsoft 365 / Google Workspace tenant admin access for the deployment
 
 These are resolved during the implementation phase and recorded in the implementation plan.

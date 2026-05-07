@@ -8,11 +8,11 @@ When generating a Word-equivalent or PDF document under the swiss_design_at_decc
 
 - `@font-face` rules for IBM Plex Sans (variable, weights 100-700) and IBM Plex Mono (Regular + Bold)
 - Brand colour tokens (`--accent: #164999`, stone palette, ink opacity tokens)
-- `@page` rules implementing the running header (logo + doc title + thin rule), the running footer (`Deccan Chemicals · {{CLASSIFICATION}}` + bare-integer page number), and suppressed furniture on cover/end pages
+- `@page` rules implementing the running header (logo + doc title + thin rule), the running footer (`Deccan Fine Chemicals · {{CLASSIFICATION}}` + bare-integer page number), and suppressed furniture on cover/end pages
 - A cover composition matching the spec exactly: 2.5″ logo top-left, 36pt light Deccan Blue title, 16pt subtitle, full-width accent rule, 5-row metadata block (DOCUMENT TYPE / PREPARED BY / DATE / VERSION / CLASSIFICATION)
 - Heading rules: `h1` is 28pt, font-weight 300, Deccan Blue, with `page-break-before: always` so every section starts on a new page
 - Code styling: inline `<code>` and `.code-inline` get IBM Plex Mono + stone-100 chip; `<pre>` and `.code-block` get full-width stone-100 panels
-- An end page composition matching the spec: centered logo, "Deccan Chemicals" brand line, contact line at low opacity
+- An end page composition matching the spec: centered logo, "Deccan Fine Chemicals" brand line, contact line at low opacity
 
 ## Slot placeholders
 

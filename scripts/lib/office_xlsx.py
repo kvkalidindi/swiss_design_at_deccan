@@ -52,8 +52,8 @@ def _set_print_header_footer(ws, title_text: str, classification: str = "Confide
     ws.oddHeader.right.font = "IBM Plex Sans"
     ws.oddHeader.right.color = "595959"
 
-    # Footer: left = "Deccan Chemicals · classification", right = "Page X of Y"
-    ws.oddFooter.left.text = f"Deccan Chemicals · {classification}"
+    # Footer: left = "Deccan Fine Chemicals · classification", right = "Page X of Y"
+    ws.oddFooter.left.text = f"Deccan Fine Chemicals · {classification}"
     ws.oddFooter.left.size = 9
     ws.oddFooter.left.font = "IBM Plex Sans"
     ws.oddFooter.left.color = "595959"
@@ -177,7 +177,7 @@ def _build_end_sheet(wb) -> None:
         except Exception:
             pass
 
-    ws["A14"] = "Deccan Chemicals"
+    ws["A14"] = "Deccan Fine Chemicals"
     ws["A14"].font = Font(name="IBM Plex Sans", size=16, color="1C1917")
     ws["A14"].alignment = Alignment(horizontal="center", vertical="center")
     ws.merge_cells("A14:H14")
