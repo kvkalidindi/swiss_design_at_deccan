@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<!--
+  Deccan Fine Chemicals document template — swiss_design_at_deccan v2.
+
+  Self-contained HTML/CSS scaffold for any Word-equivalent / PDF document
+  generated under the swiss-design-deccan skill. Filling this template with
+  content collapses the typography, layout, and brand furniture variance
+  described in skill/references/document-furniture.md.
+
+  Renderer compatibility (designed for the lowest common denominator):
+    - Chromium / headless Chromium / Puppeteer (the Claude.ai PDF runtime)
+    - WeasyPrint / Prince (where richer CSS Paged Media features exist)
+    - Modern browser print preview (Save as PDF)
+
+  This v2 of the template is Chromium-compatible:
+    - Fonts come from Google Fonts via @import (Chromium fetches at print time;
+      no tool-call needed). A local @font-face fallback follows for offline /
+      self-hosted environments where skill/assets/fonts/*.woff2 is reachable.
+    - The logo is inlined as a base64 data URI in the cover and end-page <img>
+      tags, eliminating any second fetch for the binary PNG. The emitter
+      substitutes {{LOGO_DATA_URI}} at template-emission time from
+      data/logo.png so the published artifact is fully self-contained.
+    - The running header on body pages uses CSS named strings (string-set on
+      the cover title, content: string(doc-title) in @page @top-right) — a
+      Chromium-supported mechanism. The previous v1 used position: running()
+      and content: element(), which only WeasyPrint and Prince support.
+
+  Slot placeholders (string-replace before rendering):
+
+    {{TITLE}}            Document title
+    {{SUBTITLE}}         Optional one-line subhead. Leave empty if not applicable.
+    {{DOCUMENT_TYPE}}    e.g. "Standard", "Report", "Brief", "Policy"
+    {{PREPARED_BY}}      Author or office
+    {{DATE}}             Free-form date string (e.g. "May 2026")
+    {{VERSION}}          Version string (e.g. "1.0")
+    {{CLASSIFICATION}}   One of: Public, Internal, Confidential, Restricted
+    {{BODY_HTML}}        The document body. Use <h1>, <h2>, <p>, <ul>, <ol>,
+                         <table>, <code>, <pre><code>. Each <h1> automatically
+                         starts on a new page and gets a small Deccan Blue
+                         accent rule.
+
+  Conformance: this template implements all eight hard rules from
+  document-furniture.md. Do not modify the structural CSS without
+  re-checking each rule. Do not add a second accent color. Do not apply
+  stone tints anywhere outside the .code-inline / .code-block / .callout /
+  table.banded patterns.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="light">
+  <title>{{TITLE}}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <style>
+    /* ───────── Fonts ─────────
+       Primary: Google Fonts CDN (Chromium fetches at print time). */
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+    /* Secondary fallback for offline / self-hosted renderers that have the
+       bundled WOFF2s available adjacent to this template. */
+    @font-face {
+      font-family: 'IBM Plex Sans';
+      src: url('../fonts/IBMPlexSans-Variable.woff2') format('woff2-variations'),
+           url('../fonts/IBMPlexSans-Variable.woff2') format('woff2');
+      font-weight: 100 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      src: url('../fonts/IBMPlexMono-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      src: url('../fonts/IBMPlexMono-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ───────── Brand tokens ───────── */
+    :root {
+      --accent: #164999;
+      --accent-30: rgba(22, 73, 153, 0.30);
+      --ink: #1c1917;
+      --ink-70: rgba(28, 25, 23, 0.70);
+      --ink-40: rgba(28, 25, 23, 0.40);
+      --ink-soft: #595959;
+      --stone-50: #fafaf9;
+      --stone-100: #f5f5f4;
+      --stone-200: #e7e5e4;
+      --paper: #ffffff;
+
+      --font-sans: 'IBM Plex Sans', 'Hanken Grotesk', 'Barlow', 'Host Grotesk', 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Fira Code', 'SFMono-Regular', Consolas, ui-monospace, monospace;
+    }
+
+    /* ───────── Page setup (print) ─────────
+       0.8" margins on Letter -> 6.9" / 8.5" = 81.2% live content area. */
+    @page {
+      size: Letter;
+      margin: 0.8in;
+      background: var(--paper);
+    }
+
+    @page body-page {
+      margin: 1.1in 0.8in 1.1in 0.8in;
+
+      @top-left {
+        content: 'DECCAN FINE CHEMICALS';
+        font-family: var(--font-sans);
+        font-size: 8.5pt;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        vertical-align: bottom;
+        padding-bottom: 0.15in;
+      }
+      @top-right {
+        content: string(doc-title);
+        font-family: var(--font-sans);
+        font-size: 9pt;
+        color: var(--ink-70);
+        vertical-align: bottom;
+        padding-bottom: 0.15in;
+      }
+      @bottom-left {
+        content: 'Deccan Fine Chemicals · {{CLASSIFICATION}}';
+        font-family: var(--font-sans);
+        font-size: 9pt;
+        color: var(--ink-70);
+      }
+      @bottom-right {
+        content: counter(page);
+        font-family: var(--font-sans);
+        font-size: 9pt;
+        color: var(--ink-70);
+        font-variant-numeric: tabular-nums;
+      }
+    }
+
+    @page cover-page  { margin: 0.8in; @top-left {} @top-right {} @bottom-left {} @bottom-right {} }
+    @page end-page    { margin: 0.8in; @top-left {} @top-right {} @bottom-left {} @bottom-right {} }
+
+    /* ───────── Base ───────── */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 11pt;
+      line-height: 1.55;
+      text-rendering: geometricPrecision;
+      -webkit-font-smoothing: antialiased;
+    }
+    p { margin: 0 0 9pt 0; max-width: none; text-wrap: pretty; }
+    em { font-style: italic; }
+    strong { font-weight: 500; }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ───────── Headings ───────── */
+    h1, h2, h3 {
+      font-family: var(--font-sans);
+      color: var(--accent);
+      text-wrap: balance;
+      page-break-inside: avoid;
+      page-break-after: avoid;
+      break-inside: avoid;
+      break-after: avoid;
+    }
+    h1 {
+      font-weight: 300;
+      font-size: 28pt;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      margin: 0 0 18pt 0;
+      page-break-before: always;
+      break-before: page;
+    }
+    h1::before {
+      content: "";
+      display: block;
+      width: 56pt;
+      height: 2pt;
+      background: var(--accent);
+      margin: 0 0 14pt 0;
+    }
+    h2 {
+      font-weight: 400;
+      font-size: 16pt;
+      line-height: 1.25;
+      margin: 18pt 0 6pt 0;
+    }
+    h3 {
+      font-weight: 500;
+      font-size: 12pt;
+      color: var(--ink);
+      margin: 14pt 0 4pt 0;
+    }
+
+    /* The first <h1> in the body section follows the cover; allow Chromium to
+       use the natural page break the cover already issued, instead of forcing
+       a second one. */
+    section.body > h1:first-of-type {
+      page-break-before: auto;
+      break-before: auto;
+    }
+
+    /* ───────── Code (mono + stone) ───────── */
+    code, .code-inline {
+      font-family: var(--font-mono);
+      font-size: 0.92em;
+      background: var(--stone-100);
+      padding: 0.05em 0.35em;
+      color: var(--ink);
+      border-radius: 0;
+    }
+    pre, .code-block {
+      font-family: var(--font-mono);
+      font-size: 9.5pt;
+      line-height: 1.45;
+      background: var(--stone-100);
+      color: var(--ink);
+      padding: 10pt 12pt;
+      margin: 8pt 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    pre code, pre .code-inline { background: transparent; padding: 0; font-size: inherit; }
+
+    /* ───────── Lists ───────── */
+    ul, ol { margin: 0 0 9pt 0; padding-left: 1.4em; }
+    li { margin: 0 0 3pt 0; }
+
+    /* ───────── Tables ───────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8pt 0;
+      font-size: 10pt;
+      page-break-inside: auto;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 6pt 8pt;
+      border-bottom: 0.5pt solid var(--stone-200);
+    }
+    th {
+      font-weight: 500;
+      color: var(--ink-70);
+      border-bottom-color: var(--ink);
+      border-bottom-width: 1pt;
+    }
+    table.banded tbody tr:nth-child(even) td { background: var(--stone-50); }
+
+    /* ───────── Callouts ───────── */
+    .callout {
+      background: var(--stone-100);
+      padding: 12pt 14pt;
+      margin: 10pt 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .callout > :last-child { margin-bottom: 0; }
+
+    /* ───────── Cover page ───────── */
+    .cover {
+      page: cover-page;
+      page-break-after: always;
+      break-after: page;
+      min-height: 9.4in;
+      display: flex;
+      flex-direction: column;
+      padding-top: 0.4in;
+    }
+    .cover .logo { width: 2.5in; height: auto; margin-bottom: 0.6in; }
+    .cover .title {
+      font-weight: 300;
+      font-size: 36pt;
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      color: var(--accent);
+      margin: 0 0 8pt 0;
+      max-width: 7in;
+      /* Capture the title once for use as the body running header. */
+      string-set: doc-title content();
+    }
+    .cover .subtitle {
+      font-weight: 400;
+      font-size: 16pt;
+      line-height: 1.3;
+      color: var(--ink-soft);
+      margin: 0 0 18pt 0;
+      max-width: 7in;
+    }
+    .cover .accent-rule {
+      width: 100%;
+      height: 1pt;
+      background: var(--accent);
+      margin: 0 0 18pt 0;
+    }
+    .cover .meta {
+      display: grid;
+      grid-template-columns: 1.4in 1fr;
+      row-gap: 4pt;
+      column-gap: 16pt;
+      max-width: 6in;
+    }
+    .cover .meta dt {
+      font-size: 8pt;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    .cover .meta dd {
+      font-size: 10.5pt;
+      font-weight: 400;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    /* ───────── Body section ───────── */
+    .body { page: body-page; }
+
+    /* ───────── End page ───────── */
+    .end {
+      page: end-page;
+      page-break-before: always;
+      break-before: page;
+      min-height: 9in;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .end .logo { width: 1.8in; height: auto; margin-bottom: 14pt; }
+    .end .brand { font-size: 14pt; color: var(--ink); margin: 0 0 6pt 0; }
+    .end .contact {
+      font-size: 9pt;
+      color: var(--ink-40);
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    /* ───────── On-screen fallback ───────── */
+    @media screen {
+      body { max-width: 7.4in; margin: 32pt auto; padding: 0 24pt; }
+      .cover, .end { min-height: auto; padding: 32pt 0; }
+      .cover { border-bottom: 0.5pt solid var(--stone-200); margin-bottom: 24pt; }
+      .end { border-top: 0.5pt solid var(--stone-200); margin-top: 24pt; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ───────── Cover page ───────── -->
+  <section class="cover">
+    <img class="logo" src="data:image/png;base64,{{LOGO_DATA_URI}}" alt="Deccan Fine Chemicals">
+    <h1 class="title" style="page-break-before:auto;break-before:auto">{{TITLE}}</h1>
+    <p class="subtitle">{{SUBTITLE}}</p>
+    <div class="accent-rule"></div>
+    <dl class="meta">
+      <dt>DOCUMENT TYPE</dt><dd>{{DOCUMENT_TYPE}}</dd>
+      <dt>PREPARED BY</dt><dd>{{PREPARED_BY}}</dd>
+      <dt>DATE</dt><dd>{{DATE}}</dd>
+      <dt>VERSION</dt><dd>{{VERSION}}</dd>
+      <dt>CLASSIFICATION</dt><dd>{{CLASSIFICATION}}</dd>
+    </dl>
+  </section>
+
+  <!-- ───────── Body ───────── -->
+  <section class="body">
+    {{BODY_HTML}}
+  </section>
+
+  <!-- ───────── End page ───────── -->
+  <section class="end">
+    <img class="logo" src="data:image/png;base64,{{LOGO_DATA_URI}}" alt="Deccan Fine Chemicals">
+    <p class="brand">Deccan Fine Chemicals</p>
+    <p class="contact">deccanchemicals.com · Hyderabad, India</p>
+  </section>
+
+</body>
+</html>
