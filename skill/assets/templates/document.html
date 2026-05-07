@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<!--
+  Deccan document template — swiss_design_at_deccan v1.
+
+  Self-contained HTML/CSS scaffold for any Word-equivalent / PDF
+  document generated under the swiss-design-deccan skill. Filling this
+  template with content collapses the typography, layout, and brand
+  furniture variance described in skill/references/document-furniture.md.
+
+  Slot placeholders (string-replace before rendering):
+
+    {{TITLE}}            Document title (e.g. "Python and Jupyter on the Deccan Network")
+    {{SUBTITLE}}         Optional one-line subhead. Leave empty if not applicable.
+    {{DOCUMENT_TYPE}}    e.g. "Standard", "Report", "Brief", "Policy"
+    {{PREPARED_BY}}      Author or office (e.g. "Office of the SVP, IT & Digital Transformation")
+    {{DATE}}             Free-form date string (e.g. "May 2026")
+    {{VERSION}}          Version string (e.g. "1.0")
+    {{CLASSIFICATION}}   One of: Public, Internal, Confidential, Restricted (default Confidential)
+    {{BODY_HTML}}        The document body. Use <h1>, <h2>, <p>, <ul>, <ol>, <table>,
+                         <code>, <pre><code> as appropriate. Each <h1> automatically
+                         starts on a new page and gets a small Deccan Blue accent rule.
+
+  Logo and font assets:
+
+    Default ./fonts/*.woff2 and ./logo.png references resolve when the
+    template is rendered next to the bundled assets (skill/assets/).
+    For self-contained artifacts (single HTML file shared via email,
+    stored as a single asset), inline the assets — replace the @font-face
+    src URLs with data: URIs from skill/assets/fonts.b64.txt and replace
+    the cover/end-page <img src> with the data URI from
+    skill/assets/logo.b64.txt.
+
+  Conformance: this template implements all eight hard rules from
+  document-furniture.md. Do not modify the structural CSS without
+  re-checking each rule. Do not add a second accent color. Do not
+  apply stone tints anywhere outside the .code-inline / .code-block /
+  .callout / table.banded patterns.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="light">
+  <title>{{TITLE}}</title>
+
+  <style>
+    /* ───────── Fonts ───────── */
+    @font-face {
+      font-family: 'IBM Plex Sans';
+      src: url('../fonts/IBMPlexSans-Variable.woff2') format('woff2-variations'),
+           url('../fonts/IBMPlexSans-Variable.woff2') format('woff2');
+      font-weight: 100 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      src: url('../fonts/IBMPlexMono-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'IBM Plex Mono';
+      src: url('../fonts/IBMPlexMono-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ───────── Brand tokens ───────── */
+    :root {
+      --accent: #164999;
+      --accent-30: rgba(22, 73, 153, 0.30);
+      --ink: #1c1917;
+      --ink-70: rgba(28, 25, 23, 0.70);
+      --ink-40: rgba(28, 25, 23, 0.40);
+      --ink-soft: #595959;
+      --stone-50: #fafaf9;
+      --stone-100: #f5f5f4;
+      --stone-200: #e7e5e4;
+      --paper: #ffffff;
+
+      --font-sans: 'IBM Plex Sans', 'Hanken Grotesk', 'Barlow', 'Host Grotesk', 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Fira Code', 'SFMono-Regular', Consolas, ui-monospace, monospace;
+    }
+
+    /* ───────── Page setup (print) ───────── */
+    @page {
+      size: Letter;
+      margin: 0.8in;
+      background: var(--paper);
+    }
+    @page :first { margin: 0.8in; }
+
+    @page body-page {
+      margin: 1.2in 0.8in 1.2in 0.8in;
+
+      @top-left {
+        content: element(running-header-left);
+        vertical-align: bottom;
+      }
+      @top-right {
+        content: element(running-header-right);
+        vertical-align: bottom;
+        font-family: var(--font-sans);
+        font-size: 9pt;
+        color: var(--ink-70);
+      }
+      @bottom-left {
+        content: 'Deccan Chemicals · {{CLASSIFICATION}}';
+        font-family: var(--font-sans);
+        font-size: 9pt;
+        color: var(--ink-70);
+      }
+      @bottom-right {
+        content: counter(page);
+        font-family: var(--font-sans);
+        font-size: 9pt;
+        color: var(--ink-70);
+        font-variant-numeric: tabular-nums;
+      }
+    }
+
+    @page cover-page  { margin: 0.8in; @top-left {} @top-right {} @bottom-left {} @bottom-right {} }
+    @page end-page    { margin: 0.8in; @top-left {} @top-right {} @bottom-left {} @bottom-right {} }
+
+    /* ───────── Base ───────── */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 11pt;
+      line-height: 1.55;
+      text-rendering: geometricPrecision;
+      -webkit-font-smoothing: antialiased;
+    }
+    p { margin: 0 0 9pt 0; max-width: none; text-wrap: pretty; }
+    em { font-style: italic; }
+    strong { font-weight: 500; }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ───────── Headings ───────── */
+    h1, h2, h3 {
+      font-family: var(--font-sans);
+      color: var(--accent);
+      text-wrap: balance;
+      page-break-inside: avoid;
+      page-break-after: avoid;
+      break-inside: avoid;
+      break-after: avoid;
+    }
+    h1 {
+      font-weight: 300;
+      font-size: 28pt;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      margin: 0 0 18pt 0;
+      page-break-before: always;
+      break-before: page;
+    }
+    h1::before {
+      content: "";
+      display: block;
+      width: 56pt;
+      height: 2pt;
+      background: var(--accent);
+      margin: 0 0 14pt 0;
+    }
+    h2 {
+      font-weight: 400;
+      font-size: 16pt;
+      line-height: 1.25;
+      margin: 18pt 0 6pt 0;
+    }
+    h3 {
+      font-weight: 500;
+      font-size: 12pt;
+      color: var(--ink);
+      margin: 14pt 0 4pt 0;
+    }
+
+    /* H1 page-break override: the FIRST h1 should not force a blank page
+       after the cover. The cover is page 1; the first body h1 begins on
+       page 2 naturally. */
+    section.body > h1:first-of-type {
+      page-break-before: auto;
+      break-before: auto;
+    }
+
+    /* ───────── Code (mono + stone) ───────── */
+    code, .code-inline {
+      font-family: var(--font-mono);
+      font-size: 0.92em;
+      background: var(--stone-100);
+      padding: 0.05em 0.35em;
+      color: var(--ink);
+      border-radius: 0;
+    }
+    pre, .code-block {
+      font-family: var(--font-mono);
+      font-size: 9.5pt;
+      line-height: 1.45;
+      background: var(--stone-100);
+      color: var(--ink);
+      padding: 10pt 12pt;
+      margin: 8pt 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    pre code, pre .code-inline { background: transparent; padding: 0; font-size: inherit; }
+
+    /* ───────── Lists ───────── */
+    ul, ol { margin: 0 0 9pt 0; padding-left: 1.4em; }
+    li { margin: 0 0 3pt 0; }
+
+    /* ───────── Tables ───────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8pt 0;
+      font-size: 10pt;
+      page-break-inside: auto;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 6pt 8pt;
+      border-bottom: 0.5pt solid var(--stone-200);
+    }
+    th {
+      font-weight: 500;
+      color: var(--ink-70);
+      border-bottom-color: var(--ink);
+      border-bottom-width: 1pt;
+    }
+    table.banded tbody tr:nth-child(even) td { background: var(--stone-50); }
+
+    /* ───────── Callouts ───────── */
+    .callout {
+      background: var(--stone-100);
+      padding: 12pt 14pt;
+      margin: 10pt 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .callout > :last-child { margin-bottom: 0; }
+
+    /* ───────── Cover page ───────── */
+    .cover {
+      page: cover-page;
+      page-break-after: always;
+      break-after: page;
+      min-height: 9.4in;
+      display: flex;
+      flex-direction: column;
+      padding-top: 0.4in;
+    }
+    .cover .logo { width: 2.5in; height: auto; margin-bottom: 0.6in; }
+    .cover .title {
+      font-weight: 300;
+      font-size: 36pt;
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      color: var(--accent);
+      margin: 0 0 8pt 0;
+      max-width: 7in;
+    }
+    .cover .subtitle {
+      font-weight: 400;
+      font-size: 16pt;
+      line-height: 1.3;
+      color: var(--ink-soft);
+      margin: 0 0 18pt 0;
+      max-width: 7in;
+    }
+    .cover .accent-rule {
+      width: 100%;
+      height: 1pt;
+      background: var(--accent);
+      margin: 0 0 18pt 0;
+    }
+    .cover .meta {
+      display: grid;
+      grid-template-columns: 1.4in 1fr;
+      row-gap: 4pt;
+      column-gap: 16pt;
+      max-width: 6in;
+    }
+    .cover .meta dt {
+      font-size: 8pt;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    .cover .meta dd {
+      font-size: 10.5pt;
+      font-weight: 400;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    /* ───────── Running header / footer ───────── */
+    .body { page: body-page; }
+    .running-header-left {
+      position: running(running-header-left);
+      display: flex;
+      align-items: center;
+      gap: 8pt;
+    }
+    .running-header-left img { width: 0.6in; height: auto; }
+    .running-header-right {
+      position: running(running-header-right);
+    }
+    /* Thin rule under the running header: implemented by a fixed-height
+       gradient strip in the page margin via the @top-left running element. */
+
+    /* ───────── End page ───────── */
+    .end {
+      page: end-page;
+      page-break-before: always;
+      break-before: page;
+      min-height: 9in;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .end .logo { width: 1.8in; height: auto; margin-bottom: 14pt; }
+    .end .brand { font-size: 14pt; color: var(--ink); margin: 0 0 6pt 0; }
+    .end .contact {
+      font-size: 9pt;
+      color: var(--ink-40);
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    /* ───────── No-print fallback ───────── */
+    @media screen {
+      body { max-width: 7.4in; margin: 32pt auto; padding: 0 24pt; }
+      .cover, .end { min-height: auto; padding: 32pt 0; }
+      .cover { border-bottom: 0.5pt solid var(--stone-200); margin-bottom: 24pt; }
+      .end { border-top: 0.5pt solid var(--stone-200); margin-top: 24pt; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ───────── Running header (rendered into every body page's @top-* slots) ───────── -->
+  <div class="running-header-left">
+    <img src="../logo.png" alt="Deccan">
+  </div>
+  <div class="running-header-right">{{TITLE}}</div>
+
+  <!-- ───────── Cover page ───────── -->
+  <section class="cover">
+    <img class="logo" src="../logo.png" alt="Deccan Chemicals">
+    <h1 class="title" style="page-break-before:auto">{{TITLE}}</h1>
+    <p class="subtitle">{{SUBTITLE}}</p>
+    <div class="accent-rule"></div>
+    <dl class="meta">
+      <dt>DOCUMENT TYPE</dt><dd>{{DOCUMENT_TYPE}}</dd>
+      <dt>PREPARED BY</dt><dd>{{PREPARED_BY}}</dd>
+      <dt>DATE</dt><dd>{{DATE}}</dd>
+      <dt>VERSION</dt><dd>{{VERSION}}</dd>
+      <dt>CLASSIFICATION</dt><dd>{{CLASSIFICATION}}</dd>
+    </dl>
+  </section>
+
+  <!-- ───────── Body ───────── -->
+  <section class="body">
+    {{BODY_HTML}}
+  </section>
+
+  <!-- ───────── End page ───────── -->
+  <section class="end">
+    <img class="logo" src="../logo.png" alt="Deccan Chemicals">
+    <p class="brand">Deccan Chemicals</p>
+    <p class="contact">deccanchemicals.com · Hyderabad, India</p>
+  </section>
+
+</body>
+</html>

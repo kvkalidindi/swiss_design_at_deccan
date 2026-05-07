@@ -29,6 +29,13 @@ LOGO_RAW_URL = (
     "https://raw.githubusercontent.com/kvkalidindi/swiss_design_at_deccan/"
     "main/data/logo.png"
 )
+# Font sources — three WOFF2s already converted into skill/assets/fonts/.
+# We re-bundle the binaries on each emit so the skill stays self-contained.
+FONTS_SRC = ROOT / "fonts"
+TEMPLATE_RAW_URL_BASE = (
+    "https://raw.githubusercontent.com/kvkalidindi/swiss_design_at_deccan/"
+    "main/skill/assets"
+)
 
 UPSTREAM_REFERENCES = ["components.md", "design-system.md", "tailwind-config.md", "prompting.md"]
 
@@ -466,6 +473,76 @@ If any of these fail, the regression is in the emitter (`scripts/lib/office_*.py
 """
 
 
+def emit_font_assets() -> dict[str, Path]:
+    """Convert the IBM Plex source TTFs to WOFF2 (if not already present in
+    skill/assets/fonts) and emit a base64 fallback. Returns a map of family
+    -> woff2 path."""
+    from fontTools.ttLib import TTFont
+
+    fonts_dir = SKILL / "assets" / "fonts"
+    fonts_dir.mkdir(parents=True, exist_ok=True)
+
+    pairs = [
+        ("ibm-plex-sans/IBMPlexSans-VariableFont.ttf", "IBMPlexSans-Variable.woff2"),
+        ("ibm-plex-mono/IBMPlexMono-Regular.ttf", "IBMPlexMono-Regular.woff2"),
+        ("ibm-plex-mono/IBMPlexMono-Bold.ttf", "IBMPlexMono-Bold.woff2"),
+    ]
+    out: dict[str, Path] = {}
+    for src_rel, dst_name in pairs:
+        src = FONTS_SRC / src_rel
+        dst = fonts_dir / dst_name
+        if not src.exists():
+            print(f"  WARN: missing source font {src}; skipping")
+            continue
+        if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+            f = TTFont(str(src))
+            f.flavor = "woff2"
+            f.save(str(dst))
+        out[dst_name] = dst
+
+    # Combined base64 fallback (single text artifact with marker lines so
+    # consumers can extract individual fonts).
+    import base64 as _b64
+    import textwrap as _tw
+
+    blocks = [
+        "# Deccan font assets — base64-encoded WOFF2 fallback.",
+        "# Use as data URIs in @font-face: src: url(\"data:font/woff2;base64,<contents below>\")",
+        "# Source of truth: fonts/ in the swiss_design_at_deccan repo (IBM Plex Sans + Mono, OFL-1.1).",
+        "#",
+        "# Each block starts with: BEGIN <filename>",
+        "# and ends with:           END <filename>",
+        "",
+    ]
+    for name in ("IBMPlexSans-Variable.woff2", "IBMPlexMono-Regular.woff2", "IBMPlexMono-Bold.woff2"):
+        path = fonts_dir / name
+        if not path.exists():
+            continue
+        b64 = _b64.b64encode(path.read_bytes()).decode("ascii")
+        blocks.append(f"BEGIN {name}")
+        blocks.extend(_tw.wrap(b64, 76))
+        blocks.append(f"END {name}")
+        blocks.append("")
+    (SKILL / "assets" / "fonts.b64.txt").write_text("\n".join(blocks), encoding="utf-8")
+    return out
+
+
+def emit_document_template() -> Path:
+    """Copy the bundled document.html template into skill/assets/templates/.
+
+    The canonical source lives in the repo at skill/assets/templates/document.html
+    (committed alongside the spec). We re-write it here on every emit so the
+    template moves in lockstep with the rest of the skill.
+    """
+    src = ROOT / "skill" / "assets" / "templates" / "document.html"
+    dst_dir = SKILL / "assets" / "templates"
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    dst = dst_dir / "document.html"
+    if src.exists() and src.resolve() != dst.resolve():
+        dst.write_bytes(src.read_bytes())
+    return dst
+
+
 def emit_logo_assets() -> tuple[Path, Path, str]:
     """Bundle the corporate logo into the skill so emitters never have to fetch
     it from the network.
@@ -563,32 +640,114 @@ When the corporate logo changes:
 """
 
 
+def emit_document_template_md() -> str:
+    return f"""\
+# Document Template — Deterministic Cover, Body, End
+
+When generating a Word-equivalent or PDF document under the swiss_design_at_deccan system, **fill the bundled template** rather than re-deriving the layout from prose. The template is the single source of truth for cover composition, running header / footer, end-page layout, code styling, and the eight hard rules in `references/document-furniture.md`.
+
+## Source of truth
+
+`skill/assets/templates/document.html` — a single self-contained HTML5 file with:
+
+- `@font-face` rules for IBM Plex Sans (variable, weights 100-700) and IBM Plex Mono (Regular + Bold)
+- Brand colour tokens (`--accent: #164999`, stone palette, ink opacity tokens)
+- `@page` rules implementing the running header (logo + doc title + thin rule), the running footer (`Deccan Chemicals · {{{{CLASSIFICATION}}}}` + bare-integer page number), and suppressed furniture on cover/end pages
+- A cover composition matching the spec exactly: 2.5″ logo top-left, 36pt light Deccan Blue title, 16pt subtitle, full-width accent rule, 5-row metadata block (DOCUMENT TYPE / PREPARED BY / DATE / VERSION / CLASSIFICATION)
+- Heading rules: `h1` is 28pt, font-weight 300, Deccan Blue, with `page-break-before: always` so every section starts on a new page
+- Code styling: inline `<code>` and `.code-inline` get IBM Plex Mono + stone-100 chip; `<pre>` and `.code-block` get full-width stone-100 panels
+- An end page composition matching the spec: centered logo, "Deccan Chemicals" brand line, contact line at low opacity
+
+## Slot placeholders
+
+String-replace these before rendering:
+
+| Slot | Content |
+|------|---------|
+| `{{{{TITLE}}}}` | Document title |
+| `{{{{SUBTITLE}}}}` | Optional one-line subhead |
+| `{{{{DOCUMENT_TYPE}}}}` | "Standard", "Report", "Brief", "Policy", etc. |
+| `{{{{PREPARED_BY}}}}` | Author or office |
+| `{{{{DATE}}}}` | Free-form date string |
+| `{{{{VERSION}}}}` | Version string (e.g. `1.0`) |
+| `{{{{CLASSIFICATION}}}}` | `Public`, `Internal`, `Confidential`, or `Restricted` |
+| `{{{{BODY_HTML}}}}` | The document body, as HTML |
+
+The body uses standard HTML5: `<h1>`, `<h2>`, `<h3>`, `<p>`, `<ul>`, `<ol>`, `<table>`, `<code>`, `<pre><code>`. The template's CSS does the rest.
+
+## Retrieval
+
+Same four-source cascade as the logo, in this order:
+
+1. **Skill-bundled file** — `skill/assets/templates/document.html` (always present)
+2. **Project-local file** — `skill/assets/templates/document.html` in the working tree (for repo-resident emitters)
+3. **Stable raw URL** — `{TEMPLATE_RAW_URL_BASE}/templates/document.html` — public, GitHub CDN
+4. **Inline copy** — paste the template content directly into the artifact
+
+## Rendering paths
+
+- **For Claude.ai cloud sessions**: fetch the template from the stable raw URL above. Inline the bundled fonts (`{TEMPLATE_RAW_URL_BASE}/fonts.b64.txt`) and the logo (`{TEMPLATE_RAW_URL_BASE}/logo.b64.txt`) as data URIs by replacing the `url(../fonts/...)` and `src=../logo.png` references. The result is a fully self-contained HTML artifact with zero network dependencies.
+- **For Claude Code / local Python emitters**: copy the template, run any local templating engine (Jinja2, plain string-replace, etc.), open the result in a browser to print to PDF, or feed to WeasyPrint / wkhtmltopdf for headless rendering.
+- **For Word output**: this template is for HTML/PDF. For native `.dotx` / `.docx` use the existing Office templates in `office/templates/deccan.dotx`, which encode the same rules in Word's styles.xml.
+
+## Why a template, not just a spec
+
+The spec describes the rules ("title is 36pt, font-weight 300, Deccan Blue"); the template *enforces* them. When three different cloud sessions are asked to emit a Deccan PDF from the same prose spec, they produce three different documents — different fonts, different metadata schemas, different heading weights — because the spec leaves room for interpretation. The template removes that room. The model fills slots; it does not invent the surface.
+
+## Conformance
+
+The template implements every hard rule in `document-furniture.md`:
+
+- ✅ Self-contained cover with logo + title + subtitle + author + version + date + classification
+- ✅ Cover has no header/footer/page number (`@page cover-page` clears them)
+- ✅ Every `<h1>` starts on a new page (`page-break-before: always`)
+- ✅ Body fills full content width (no `max-w-60ch` restriction)
+- ✅ 0.8″ margins → 6.9″/8.5″ = 81.2% live content area
+- ✅ End page after explicit page break (`page-break-before: always` on `.end`)
+- ✅ Footer page numbers as bare integers (`content: counter(page)`)
+- ✅ White page background; stone tints reserved for `.code-inline` / `.code-block` / `.callout` / `table.banded`
+
+Do not modify the structural CSS without re-checking each rule against `document-furniture.md`. Do not add a second accent colour. Do not apply stone tints anywhere outside the four allowed selectors.
+"""
+
+
 def main() -> int:
     ensure_upstream()
     transforms = json.loads(TRANSFORMS.read_text(encoding="utf-8"))
 
-    if SKILL.exists():
-        shutil.rmtree(SKILL)
-    (SKILL / "references").mkdir(parents=True)
+    # Only wipe the parts of the skill we regenerate every run from upstream +
+    # transforms. The assets/ tree (logo, fonts, template HTML) is managed
+    # idempotently by the dedicated emit_*_assets helpers and must survive.
+    refs_dir = SKILL / "references"
+    if refs_dir.exists():
+        shutil.rmtree(refs_dir)
+    refs_dir.mkdir(parents=True)
+    skill_md_path = SKILL / "SKILL.md"
+    if skill_md_path.exists():
+        skill_md_path.unlink()
 
     skill_md = (TMP_SWISS / "SKILL.md").read_text(encoding="utf-8")
     skill_md = rewrite_frontmatter(skill_md, transforms["frontmatter"])
     skill_md = transform_text(skill_md, transforms)
-    (SKILL / "SKILL.md").write_text(skill_md, encoding="utf-8")
+    skill_md_path.write_text(skill_md, encoding="utf-8")
 
     for ref in UPSTREAM_REFERENCES:
         src = (TMP_SWISS / "references" / ref).read_text(encoding="utf-8")
         out = transform_text(src, transforms)
-        (SKILL / "references" / ref).write_text(out, encoding="utf-8")
+        (refs_dir / ref).write_text(out, encoding="utf-8")
 
-    (SKILL / "references" / "data-viz.md").write_text(emit_data_viz_md(), encoding="utf-8")
-    (SKILL / "references" / "brand-marks.md").write_text(emit_brand_marks_md(), encoding="utf-8")
-    (SKILL / "references" / "document-furniture.md").write_text(emit_document_furniture_md(), encoding="utf-8")
+    (refs_dir / "data-viz.md").write_text(emit_data_viz_md(), encoding="utf-8")
+    (refs_dir / "brand-marks.md").write_text(emit_brand_marks_md(), encoding="utf-8")
+    (refs_dir / "document-furniture.md").write_text(emit_document_furniture_md(), encoding="utf-8")
 
     _, _, b64 = emit_logo_assets()
-    (SKILL / "references" / "logo-asset.md").write_text(
+    (refs_dir / "logo-asset.md").write_text(
         emit_logo_asset_md(b64, LOGO_SRC.stat().st_size), encoding="utf-8"
     )
+
+    emit_font_assets()
+    emit_document_template()
+    (refs_dir / "document-template.md").write_text(emit_document_template_md(), encoding="utf-8")
 
     print("Generated:")
     for p in sorted(SKILL.rglob("*.md")):

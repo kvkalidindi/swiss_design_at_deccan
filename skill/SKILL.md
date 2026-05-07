@@ -284,3 +284,4 @@ After applying Swiss styling, fetch the rules above and audit the result for acc
 | Secondary green mark — when (and when not) to use `#71BF4D` | `references/brand-marks.md` |
 | Headers, footers, cover and end pages for Word/PowerPoint/Excel/PDF | `references/document-furniture.md` |
 | Reliable logo retrieval — bundled asset, base64 fallback, stable URL | `references/logo-asset.md` |
+| Deterministic HTML/PDF document template — fill slots, don't reinvent the surface | `references/document-template.md` (the template itself is at `assets/templates/document.html`; bundled fonts at `assets/fonts/` with a base64 fallback at `assets/fonts.b64.txt`) |
