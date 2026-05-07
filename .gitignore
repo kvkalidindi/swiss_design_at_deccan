@@ -44,6 +44,7 @@ data/palette.json
 
 # Local-only template previews (PDFs rendered for visual verification)
 outputs/template_previews/
+outputs/python_admin_guide.*
 
 # Deploy run logs (generated locally)
 deploy/_elevated_run.log

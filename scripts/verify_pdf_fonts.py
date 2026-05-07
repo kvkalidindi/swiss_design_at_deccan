@@ -21,7 +21,8 @@ import sys
 import zlib
 from pathlib import Path
 
-REQUIRED = ("IBMPlexSans", "IBMPlexMono")
+REQUIRED = ("IBMPlexSans",)  # Sans appears on every page (cover, headers, body)
+EXPECTED_IF_USED = ("IBMPlexMono",)  # Mono only embeds when the doc has <code>/<pre>
 FORBIDDEN = ("DejaVuSans", "DejaVuSerif", "Liberation", "Nimbus", "FreeSans", "FreeMono")
 
 
@@ -56,6 +57,16 @@ def verify(path: Path) -> list[str]:
     return problems
 
 
+def informational(path: Path) -> list[str]:
+    """Non-fatal observations (e.g. Mono absent because no code in the doc)."""
+    pool = _pdf_text_pool(path.read_bytes())
+    notes: list[str] = []
+    for needle in EXPECTED_IF_USED:
+        if needle.encode("ascii") not in pool:
+            notes.append(f"{needle} not embedded — expected if the document has no <code>/<pre> content")
+    return notes
+
+
 def main(argv: list[str]) -> int:
     if not argv:
         print("usage: verify_pdf_fonts.py <pdf> [<pdf> ...]", file=sys.stderr)
@@ -70,7 +81,9 @@ def main(argv: list[str]) -> int:
             for p in problems:
                 print(f"  - {p}")
         else:
-            print(f"OK   {path}  (IBMPlexSans + IBMPlexMono embedded, no fallbacks)")
+            print(f"OK   {path}  (IBMPlexSans embedded, no forbidden fallbacks)")
+            for note in informational(path):
+                print(f"  note: {note}")
     return rc
 
 
