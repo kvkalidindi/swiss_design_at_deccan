@@ -283,3 +283,4 @@ After applying Swiss styling, fetch the rules above and audit the result for acc
 | Multi-series chart palette and data-viz rules | `references/data-viz.md` |
 | Secondary green mark — when (and when not) to use `#71BF4D` | `references/brand-marks.md` |
 | Headers, footers, cover and end pages for Word/PowerPoint/Excel/PDF | `references/document-furniture.md` |
+| Reliable logo retrieval — bundled asset, base64 fallback, stable URL | `references/logo-asset.md` |

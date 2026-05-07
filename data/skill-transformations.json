@@ -54,7 +54,7 @@
       "anchor": "SKILL.md reference table",
       "context": "Append data-viz, brand-marks, and document-furniture rows to the reference-files table in SKILL.md",
       "find_block": "| Paste-ready `tailwind.config.js` and CSS `@theme` block | `references/tailwind-config.md` |\n| Applying this system to an existing page, audit checklist | `references/prompting.md` |",
-      "replace_block": "| Paste-ready `tailwind.config.js` and CSS `@theme` block | `references/tailwind-config.md` |\n| Applying this system to an existing page, audit checklist | `references/prompting.md` |\n| Multi-series chart palette and data-viz rules | `references/data-viz.md` |\n| Secondary green mark — when (and when not) to use `#71BF4D` | `references/brand-marks.md` |\n| Headers, footers, cover and end pages for Word/PowerPoint/Excel/PDF | `references/document-furniture.md` |"
+      "replace_block": "| Paste-ready `tailwind.config.js` and CSS `@theme` block | `references/tailwind-config.md` |\n| Applying this system to an existing page, audit checklist | `references/prompting.md` |\n| Multi-series chart palette and data-viz rules | `references/data-viz.md` |\n| Secondary green mark — when (and when not) to use `#71BF4D` | `references/brand-marks.md` |\n| Headers, footers, cover and end pages for Word/PowerPoint/Excel/PDF | `references/document-furniture.md` |\n| Reliable logo retrieval — bundled asset, base64 fallback, stable URL | `references/logo-asset.md` |"
     },
     {
       "anchor": "prompting.md accent picker table",
