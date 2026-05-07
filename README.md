@@ -87,6 +87,50 @@ A solo developer runs `.\deploy\install.ps1` and is fully set up. IT teams adapt
 
 **Project status: complete.** All 5 plans shipped. Each layer (palette, skill, Office, Workspace, deployment) is independently usable, regenerable, testable.
 
+## Known issues
+
+### Claude.ai is not a deterministic high-fidelity PDF renderer
+
+Documents generated through Claude.ai (web, desktop, mobile) are rendered by whichever PDF pipeline the back-end happens to invoke for that run. We have observed three different renderers across runs of the same document on this project:
+
+| Run | Producer / Creator | Embedded fonts |
+|-----|---------------------|----------------|
+| `python_and_jupyter_admin_guide.pdf` | Qt 5.15.13 / **wkhtmltopdf 0.12.6** | LiberationSans (regular/bold/italic) + LiberationMono |
+| `python_admin_guide_3.pdf` | **Skia/PDF m141** (headless Chromium on Linux) | DejaVu Sans + DejaVu Sans Mono |
+| `python_admin_guide_4.pdf` | **Skia/PDF m148** (headless Edge / Chromium on Windows) | IBM Plex Sans subsets (after the v3 template fix) |
+
+This is not unique to Claude.ai — every system that delegates rendering to a third-party (CI runners, ephemeral cloud containers, "open in Word Online") has the same property. The renderer is not part of your contract; only the bytes you hand it are.
+
+#### Why this happens
+
+We don't have authoritative visibility into Anthropic's internal artifact-rendering pipeline. The honest possibilities:
+
+- The Claude.ai web app, desktop app, Claude Code, and any agentic / file-output capability each likely call into different rendering services depending on file type, infrastructure region, and whether the run was interactive vs. tool-driven. There is no public guarantee that "render this HTML to PDF" goes through the same pipeline across runs — only that it produces *a* PDF.
+- The pipelines themselves get upgraded out from under users. The Skia/PDF version went `m141` → `m148` between the broken and the regenerated PDF. Behavior shifts even within a single nominally-identical renderer.
+- "Generate a PDF" is sometimes done by the model emitting Markdown / HTML and a server-side post-processor doing the conversion (wkhtmltopdf is the cheapest off-the-shelf choice for that), and sometimes by spinning up a headless browser inside a sandbox. Cost, latency, and language all push the choice around.
+
+#### Why network egress to Google Fonts is blocked in the rendering environment
+
+Almost certainly a deliberate security choice, not an oversight. A sandbox that runs untrusted, prompt-influenceable code with outbound HTTP egress is an SSRF and exfiltration vector — the same prompt that says "fetch Google Fonts" can be replaced by an injection that says "fetch attacker.example.com with the contents of the document." The standard mitigation is a default-deny egress policy with a narrow allowlist. Google Fonts is a reasonable allowlist candidate in principle, but it is not on the list today, and even if it were, that just shifts the dependency onto Google's CDN being reachable and the URL being stable. CDNs do disappear (Adobe Typekit's Edge Web Fonts, the GDPR injunction in Germany in 2022 that briefly made `fonts.googleapis.com` legally hazardous to embed in EU pages).
+
+#### How this project mitigates it
+
+Document fidelity in this design system does not depend on the renderer's environment. Every spec-critical resource lives **inside the artifact**:
+
+- IBM Plex Sans (variable, weights 100–700) and IBM Plex Mono (regular + bold) are inlined as base64 WOFF2 data URIs in `@font-face src:` (`skill/assets/templates/document.html`). `font-display: block` forces the renderer to wait for the data-URI decode rather than painting a fallback.
+- The corporate logo is inlined as a base64 PNG data URI in the cover and end-page `<img>` tags.
+- No `@import`, no CDN URLs, no relative `../fonts/` paths, no system-font enumeration.
+- `scripts/verify_pdf_fonts.py` asserts post-render that `IBMPlexSans` is in the embedded font dictionary and that no DejaVu / Liberation / Nimbus / FreeSans fallback families are present. Run it on every produced PDF.
+
+#### Operational guidance
+
+Do not position Claude.ai as a high-fidelity print-production endpoint. Position it as a *content* tool, and route final-fidelity production through a renderer you control:
+
+- **Native Office formats**: Office on Windows with the deccan `.dotx` / `.potx` / `.xltx` templates and the bundled fonts installed via `deploy/install.ps1`.
+- **HTML / PDF**: a pinned Playwright + Chromium build, a reproducible Docker image with WeasyPrint, or an explicit `msedge --headless=new --print-to-pdf` invocation against the v3 template.
+
+Use the same self-contained template in both paths and the output is byte-identical regardless of whether Claude.ai, Claude Code, or a teammate's laptop produced it.
+
 ## Roadmap
 
 - ~~**Plan 2** — modify `zeke/swiss-design-skill` to consume these tokens~~ **complete (v0.2.0)**
