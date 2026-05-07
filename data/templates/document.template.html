@@ -12,10 +12,14 @@
     - WeasyPrint / Prince (where richer CSS Paged Media features exist)
     - Modern browser print preview (Save as PDF)
 
-  This v2 of the template is Chromium-compatible:
-    - Fonts come from Google Fonts via @import (Chromium fetches at print time;
-      no tool-call needed). A local @font-face fallback follows for offline /
-      self-hosted environments where skill/assets/fonts/*.woff2 is reachable.
+  This v3 of the template is Chromium-compatible and fully self-contained:
+    - Fonts (IBM Plex Sans variable, IBM Plex Mono regular + bold) are inlined
+      as base64 data URIs in @font-face rules. The emitter substitutes the
+      FONTS_CSS slot at template-emission time from skill/assets/fonts/*.woff2
+      so the rendered HTML never depends on Google Fonts egress, the
+      filesystem layout, or any system-installed font. font-display: block
+      forces the renderer to wait for the data URI decode, eliminating the
+      DejaVu fallback path that earlier revisions hit on Linux sandboxes.
     - The logo is inlined as a base64 data URI in the cover and end-page <img>
       tags, eliminating any second fetch for the binary PNG. The emitter
       substitutes {{LOGO_DATA_URI}} at template-emission time from
@@ -51,38 +55,13 @@
   <meta name="color-scheme" content="light">
   <title>{{TITLE}}</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <style>
     /* ───────── Fonts ─────────
-       Primary: Google Fonts CDN (Chromium fetches at print time). */
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
-
-    /* Secondary fallback for offline / self-hosted renderers that have the
-       bundled WOFF2s available adjacent to this template. */
-    @font-face {
-      font-family: 'IBM Plex Sans';
-      src: url('../fonts/IBMPlexSans-Variable.woff2') format('woff2-variations'),
-           url('../fonts/IBMPlexSans-Variable.woff2') format('woff2');
-      font-weight: 100 700;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'IBM Plex Mono';
-      src: url('../fonts/IBMPlexMono-Regular.woff2') format('woff2');
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: 'IBM Plex Mono';
-      src: url('../fonts/IBMPlexMono-Bold.woff2') format('woff2');
-      font-weight: 700;
-      font-style: normal;
-      font-display: swap;
-    }
+       IBM Plex Sans + Mono inlined as base64 WOFF2 data URIs. The skill
+       emitter substitutes the FONTS_CSS slot from skill/assets/fonts/*.woff2
+       at template-emission time. Network egress, filesystem layout, and
+       system-installed fonts are all irrelevant to the rendered output. */
+    {{FONTS_CSS}}
 
     /* ───────── Brand tokens ───────── */
     :root {

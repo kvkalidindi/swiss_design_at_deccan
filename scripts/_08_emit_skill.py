@@ -14,6 +14,7 @@ Idempotent: running multiple times produces the same output.
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import shutil
 import subprocess
@@ -554,16 +555,24 @@ def emit_font_assets() -> dict[str, Path]:
         "# and ends with:           END <filename>",
         "",
     ]
-    for name in ("IBMPlexSans-Variable.woff2", "IBMPlexMono-Regular.woff2", "IBMPlexMono-Bold.woff2"):
+    canonical_order = ("IBMPlexSans-Variable.woff2", "IBMPlexMono-Regular.woff2", "IBMPlexMono-Bold.woff2")
+    sha = hashlib.sha256()
+    for name in canonical_order:
         path = fonts_dir / name
         if not path.exists():
             continue
-        b64 = _b64.b64encode(path.read_bytes()).decode("ascii")
+        raw = path.read_bytes()
+        sha.update(name.encode("ascii"))
+        sha.update(b"\0")
+        sha.update(raw)
+        sha.update(b"\0")
+        b64 = _b64.b64encode(raw).decode("ascii")
         blocks.append(f"BEGIN {name}")
         blocks.extend(_tw.wrap(b64, 76))
         blocks.append(f"END {name}")
         blocks.append("")
     (SKILL / "assets" / "fonts.b64.txt").write_text("\n".join(blocks), encoding="utf-8")
+    (SKILL / "assets" / "fonts.b64.sha256").write_text(sha.hexdigest() + "\n", encoding="ascii")
     return out
 
 
@@ -585,7 +594,38 @@ def emit_document_template() -> Path:
 
     template = src.read_text(encoding="utf-8")
     logo_b64 = base64.b64encode(LOGO_SRC.read_bytes()).decode("ascii")
+
+    fonts_dir = SKILL / "assets" / "fonts"
+    sans = base64.b64encode((fonts_dir / "IBMPlexSans-Variable.woff2").read_bytes()).decode("ascii")
+    mono_r = base64.b64encode((fonts_dir / "IBMPlexMono-Regular.woff2").read_bytes()).decode("ascii")
+    mono_b = base64.b64encode((fonts_dir / "IBMPlexMono-Bold.woff2").read_bytes()).decode("ascii")
+    fonts_css = (
+        "@font-face {\n"
+        "      font-family: 'IBM Plex Sans';\n"
+        f"      src: url(data:font/woff2;base64,{sans}) format('woff2-variations'),\n"
+        f"           url(data:font/woff2;base64,{sans}) format('woff2');\n"
+        "      font-weight: 100 700;\n"
+        "      font-style: normal;\n"
+        "      font-display: block;\n"
+        "    }\n"
+        "    @font-face {\n"
+        "      font-family: 'IBM Plex Mono';\n"
+        f"      src: url(data:font/woff2;base64,{mono_r}) format('woff2');\n"
+        "      font-weight: 400;\n"
+        "      font-style: normal;\n"
+        "      font-display: block;\n"
+        "    }\n"
+        "    @font-face {\n"
+        "      font-family: 'IBM Plex Mono';\n"
+        f"      src: url(data:font/woff2;base64,{mono_b}) format('woff2');\n"
+        "      font-weight: 700;\n"
+        "      font-style: normal;\n"
+        "      font-display: block;\n"
+        "    }"
+    )
+
     rendered = template.replace("{{LOGO_DATA_URI}}", logo_b64)
+    rendered = rendered.replace("{{FONTS_CSS}}", fonts_css)
     dst.write_text(rendered, encoding="utf-8")
     return dst
 
@@ -699,7 +739,7 @@ When generating a Word-equivalent or PDF document under the swiss_design_at_decc
 
 The template includes:
 
-- A Google Fonts `@import` for IBM Plex Sans (italic + weights 300/400/500/600) and IBM Plex Mono (weights 400/500/700). Chromium fetches Google Fonts at print time without an additional tool call. A secondary `@font-face` fallback pointing at the bundled WOFF2s in `skill/assets/fonts/` is included for offline / self-hosted environments.
+- IBM Plex Sans (variable, weights 100–700) and IBM Plex Mono (regular + bold) inlined as base64 WOFF2 data URIs in `@font-face src:`. The skill emitter substitutes the FONTS_CSS slot at template-emission time from `skill/assets/fonts/*.woff2`, so the published HTML never depends on Google Fonts egress, on the `../fonts/` relative path resolving, or on any system-installed font. `font-display: block` forces the renderer to wait for the data-URI decode rather than painting a fallback. Earlier revisions relied on a Google Fonts `@import` plus a relative `@font-face` fallback; both routes failed silently in headless Chromium on Linux sandboxes (the Claude.ai PDF runtime), causing DejaVu substitution.
 - Brand colour tokens (`--accent: #164999`, stone palette, ink opacity tokens).
 - `@page` rules implementing the running header and footer on body pages and suppressing both on cover and end pages.
   - Top-left: `DECCAN FINE CHEMICALS` set in caption-style brand caps, Deccan Blue.
@@ -718,8 +758,8 @@ The template targets the lowest common denominator of the renderers that produce
 
 | Renderer | Where it runs | Status |
 |----------|---------------|--------|
-| Headless Chromium / Puppeteer | The Claude.ai cloud PDF runtime; modern browsers (Save as PDF) | Fully supported. Fonts, logo, headers, and footers all render. |
-| WeasyPrint | Local Python pipelines on a workstation | Fully supported. The bundled WOFF2 fallback applies if Google Fonts is unreachable. |
+| Headless Chromium / Puppeteer | The Claude.ai cloud PDF runtime; modern browsers (Save as PDF) | Fully supported. Inlined WOFF2 data URIs decode locally; no network or filesystem dependency. |
+| WeasyPrint | Local Python pipelines on a workstation | Fully supported. Same inlined data URIs. |
 | Prince | High-end print pipelines | Fully supported. |
 
 Earlier template revisions used CSS Paged Media `position: running()` and `content: element()` for the running header. Those features are present in WeasyPrint and Prince but absent in Chromium, so the running header was invisible in Chromium-rendered PDFs. The current template uses `string-set` and `string()` instead, which Chromium implements.
@@ -752,8 +792,9 @@ In retrieval-cascade order, first source that succeeds wins:
 
 ## Rendering paths
 
-- **Claude.ai cloud sessions**: fetch the template from the stable raw URL. Fonts load from Google Fonts at print time (Chromium fetches them automatically). The logo is already inlined as a data URI. No further fetches required.
-- **Claude Code / local Python emitters**: copy the template, run a local templating step (Jinja2, plain string replacement, or otherwise), open the rendered HTML in a browser and use Save as PDF, or feed to WeasyPrint or wkhtmltopdf for headless rendering. If Google Fonts is blocked at the corporate egress layer, the bundled `skill/assets/fonts/*.woff2` fallback applies.
+- **Claude.ai cloud sessions**: fetch the template from the stable raw URL. Both the corporate logo and the IBM Plex font set are already inlined as base64 data URIs in the published file, so no further fetches are required and the headless Chromium sandbox's lack of network egress does not affect rendering.
+- **Claude Code / local Python emitters**: copy the published template, run a local templating step (plain string replacement on the consumer slots — `{{{{TITLE}}}}`, `{{{{BODY_HTML}}}}`, etc.), then feed the result to headless Chromium (Playwright preferred), WeasyPrint, or any modern browser's Save as PDF. The font set rides inside the HTML; system-installed fonts are not consulted.
+- **Verification**: after rendering, run `python -m scripts.verify_pdf_fonts <pdf>` to assert that the embedded font dictionary contains `IBMPlexSans` and `IBMPlexMono` and contains no DejaVu / Liberation / Nimbus / FreeSans fallback families. This catches the silent-substitution failure mode the v2 template was hitting.
 - **Word output**: this template is for HTML/PDF only. For native `.dotx`/`.docx` use the Office templates in `office/templates/deccan.dotx`, which encode the same rules in styles.xml.
 
 ## Conformance
